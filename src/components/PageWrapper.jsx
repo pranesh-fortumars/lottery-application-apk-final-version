@@ -187,6 +187,7 @@ export const Header = ({ title, showBack = false }) => {
 
 export const BottomNav = () => {
   const { user } = useAuth();
+  const { appSettings } = useCart();
   const isAdmin = user?.role === 'admin';
 
   const userLinks = [
