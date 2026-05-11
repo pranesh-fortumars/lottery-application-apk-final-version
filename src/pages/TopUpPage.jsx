@@ -18,7 +18,7 @@ const TopUpPage = () => {
 
   const amounts = ['100.00', '200.00', '500.00', '1000.00', '2000.00', '5000.00'];
 
-  const handleTopup = async (transactionId) => {
+  const handleTopup = async (transactionId, userUpiId) => {
     if (!user) return;
     
     setShowPayment(false); 
@@ -30,6 +30,8 @@ const TopUpPage = () => {
       await addDoc(collection(db, 'pending_transactions'), {
         userId: user.uid,
         userName: user.name || 'Unknown',
+        userMobile: user.mobile || 'No Mobile',
+        userUpiId: userUpiId,
         type: 'topup',
         amount: topupVal,
         transactionId: transactionId,

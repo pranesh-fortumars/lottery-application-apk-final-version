@@ -332,7 +332,7 @@ export const CartProvider = ({ children }) => {
   const removeFromCart = (id) => setCart((prev) => prev.filter((item) => item.id !== id));
   const clearCart = () => setCart([]);
 
-  const confirmPurchase = async (isPrepaid = false, transactionId = null) => {
+  const confirmPurchase = async (isPrepaid = false, transactionId = null, userUpiId = null) => {
     if (cart.length === 0 || !user) return;
     
     const totalCost = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
@@ -357,6 +357,8 @@ export const CartProvider = ({ children }) => {
         batch.set(topupRef, {
           userId: user.uid,
           userName: user.name || 'Unknown',
+          userMobile: user.mobile || 'No Mobile',
+          userUpiId: userUpiId,
           type: 'purchase',
           amount: totalCost,
           transactionId: transactionId,

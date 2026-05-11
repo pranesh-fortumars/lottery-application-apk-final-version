@@ -8,6 +8,7 @@ const PaymentModal = ({ isOpen, onClose, amount, onConfirm }) => {
   const [copied, setCopied] = React.useState(false);
   const [showInput, setShowInput] = React.useState(false);
   const [transactionId, setTransactionId] = React.useState('');
+  const [userUpiId, setUserUpiId] = React.useState('');
 
   const handleCopy = () => {
     if (activePayment?.upiId) {
@@ -113,22 +114,36 @@ const PaymentModal = ({ isOpen, onClose, amount, onConfirm }) => {
                 </>
               ) : (
                 <div className="space-y-4">
-                  <div>
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Enter Transaction ID</label>
-                    <input 
-                      type="text" 
-                      value={transactionId}
-                      onChange={(e) => setTransactionId(e.target.value)}
-                      placeholder="e.g. 123456789012"
-                      className="w-full mt-1 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-[#ff0033] focus:ring-1 focus:ring-[#ff0033]"
-                    />
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Your UPI ID (From which you paid)</label>
+                      <input 
+                        type="text" 
+                        value={userUpiId}
+                        onChange={(e) => setUserUpiId(e.target.value)}
+                        placeholder="e.g. user@okaxis"
+                        className="w-full mt-1 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-[#ff0033] focus:ring-1 focus:ring-[#ff0033]"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Enter Transaction ID / UTR</label>
+                      <input 
+                        type="text" 
+                        value={transactionId}
+                        onChange={(e) => setTransactionId(e.target.value)}
+                        placeholder="e.g. 123456789012"
+                        className="w-full mt-1 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-[#ff0033] focus:ring-1 focus:ring-[#ff0033]"
+                      />
+                    </div>
                   </div>
                   <button 
                     onClick={() => {
+                      if (!userUpiId.trim()) return alert("Please enter your UPI ID");
                       if (!transactionId.trim()) return alert("Please enter Transaction ID");
-                      onConfirm(transactionId);
+                      onConfirm(transactionId, userUpiId);
                       setShowInput(false);
                       setTransactionId('');
+                      setUserUpiId('');
                     }}
                     className="w-full bg-[#ff0033] text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-red-500/20 active:scale-95 transition-all"
                   >

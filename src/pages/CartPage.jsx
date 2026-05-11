@@ -20,13 +20,13 @@ const CartPage = () => {
     setShowPayment(true);
   };
 
-  const handlePaymentConfirm = async (transactionId) => {
+  const handlePaymentConfirm = async (transactionId, userUpiId) => {
     setShowPayment(false);
     setIsProcessing(true);
     
     try {
-      await confirmPurchase(true, transactionId); 
-      navigate('/home'); // Or somewhat depending on whether they can view pending
+      await confirmPurchase(true, transactionId, userUpiId); 
+      navigate('/home'); 
     } catch (error) {
       console.error("Purchase error:", error);
       alert("Failed to record payment. Please try again.");
