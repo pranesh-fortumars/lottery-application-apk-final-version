@@ -68,7 +68,7 @@ export const AuthProvider = ({ children }) => {
         mobile: additionalData.mobile || '',
         referral: additionalData.referral || '',
         role: 'user',
-        balance: 1000, // Initial balance
+        balance: 0, // Initial balance set to zero
         createdAt: new Date().toISOString()
       };
       
@@ -100,7 +100,7 @@ export const AuthProvider = ({ children }) => {
               name: isDefaultAdmin ? 'Super Admin' : 'Test User',
               mobile: isDefaultAdmin ? '0000000000' : '9999999999',
               role: isDefaultAdmin ? 'admin' : 'user',
-              balance: isDefaultAdmin ? 999999 : 5000,
+              balance: isDefaultAdmin ? 999999 : 0,
               status: 'Active',
               createdAt: new Date().toISOString()
             });
