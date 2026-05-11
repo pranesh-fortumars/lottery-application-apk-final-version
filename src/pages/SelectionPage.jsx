@@ -9,7 +9,7 @@ import { getSlotById } from '../constants/lotteryConfig';
 const SelectionPage = () => {
   const navigate = useNavigate();
   const { gameId } = useParams();
-  const { cart } = useCart();
+  const { cart, appSettings } = useCart();
   
   const slotData = getSlotById(gameId);
   const drawTime = slotData?.time || '01:00 PM';
