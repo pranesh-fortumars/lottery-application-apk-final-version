@@ -39,9 +39,10 @@ export const CartProvider = ({ children }) => {
   const [appSettings, setAppSettings] = React.useState({
     jackpotVisible: true,
     maintenanceMode: false,
-    brandName: 'DIAMOND AGENCY',
+    brandName: 'SMS Lottery',
     sessionPersistence: '04 HOURS (STANDARD)',
-    keralaSalesClosed: false
+    keralaSalesClosed: false,
+    customerCare: '+91 00000 00000'
   });
   const [loading, setLoading] = React.useState(true);
 

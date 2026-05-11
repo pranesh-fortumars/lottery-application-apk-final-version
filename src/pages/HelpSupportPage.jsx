@@ -2,9 +2,11 @@ import React from 'react';
 import PageWrapper from '../components/PageWrapper';
 import { HelpCircle, Mail, MessageCircle, FileText, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 
 const HelpSupportPage = () => {
   const navigate = useNavigate();
+  const { appSettings } = useCart();
 
   const supportOptions = [
     { icon: <MessageCircle size={20} />, label: 'Live Chat', desc: 'Usually replies in 5 minutes', action: () => alert('Live chat agent is currently unavailable. Please try again during business hours.') },
@@ -56,8 +58,8 @@ const HelpSupportPage = () => {
           ))}
 
           <div className="bg-white p-6 rounded-[2rem] border border-gray-200 mt-8 shadow-sm text-center">
-             <h3 className="text-sm font-black text-gray-900 uppercase italic">Diamond Secretariat</h3>
-             <p className="text-[10px] text-gray-400 font-bold mt-1">Helpline: +91 1800-DIAMOND</p>
+             <h3 className="text-sm font-black text-gray-900 uppercase italic">{appSettings.brandName}</h3>
+             <p className="text-[10px] text-gray-400 font-bold mt-1">Helpline: {appSettings.customerCare}</p>
              <p className="text-[10px] text-gray-400 font-bold">Mon-Sat, 9AM to 9PM IST</p>
           </div>
         </div>

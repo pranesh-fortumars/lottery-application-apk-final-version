@@ -81,8 +81,20 @@ const GeneralSettingsWithContext = () => {
             type="text" 
             value={localSettings.hoveringNews || ''} 
             onChange={(e) => handleChange('hoveringNews', e.target.value)} 
-            placeholder="E.g. Welcome to Diamond Agency!"
+            placeholder="E.g. Welcome to SMS Lottery!"
             className="w-full bg-gray-50/50 border border-gray-100 rounded-2xl px-6 h-16 font-black text-gray-800 outline-none text-xs focus:bg-white focus:border-[#ff004d]/20 transition-all uppercase tracking-widest"
+          />
+        </div>
+      </SettingRow>
+
+      <SettingRow label="Customer Care Number" desc="Dynamic helpline displayed in Help & Support and on receipts.">
+        <div className="relative">
+          <Bell className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-200" size={20} />
+          <input 
+            type="text" 
+            value={localSettings.customerCare || ''} 
+            onChange={(e) => handleChange('customerCare', e.target.value)}
+            className="bg-gray-50/50 border border-gray-100 rounded-2xl pl-16 pr-6 h-16 font-black text-gray-800 outline-none w-full text-xs focus:bg-white focus:border-[#ff004d]/20 transition-all uppercase tracking-widest" 
           />
         </div>
       </SettingRow>
