@@ -88,7 +88,7 @@ const AnimatedRoutes = () => {
           
           <Route path="/home" element={
             <ProtectedRoute role="user">
-              <PageWrapper title="Diamond Agency">
+              <PageWrapper>
                 <Dashboard />
               </PageWrapper>
             </ProtectedRoute>

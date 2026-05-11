@@ -25,11 +25,13 @@ import {
   ChevronLeft
 } from 'lucide-react';
 
-export const Header = ({ title = "DIAMOND AGENCY", showBack = false }) => {
+export const Header = ({ title, showBack = false }) => {
   const navigate = useNavigate();
   const { logout, user } = useAuth();
-  const { notifications, markAllRead, lastAnnouncement, hoveringNews } = useCart();
+  const { notifications, markAllRead, lastAnnouncement, hoveringNews, appSettings } = useCart();
   const [showNotifs, setShowNotifs] = useState(false);
+  
+  const displayTitle = title || appSettings.brandName || "SECURE PORTAL";
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -54,7 +56,7 @@ export const Header = ({ title = "DIAMOND AGENCY", showBack = false }) => {
                  <img src="https://img.icons8.com/color/48/000000/treasure-chest.png" alt="Logo" className="w-7 h-7" />
               </div>
             )}
-            <h1 className="text-lg font-condensed font-black tracking-tighter uppercase italic leading-none">{title}</h1>
+            <h1 className="text-lg font-condensed font-black tracking-tighter uppercase italic leading-none">{displayTitle}</h1>
           </div>
           <div className="flex items-center gap-2">
             {user && (
@@ -208,7 +210,7 @@ export const BottomNav = () => {
   return (
     <div className="w-full shadow-[0_-8px_30px_rgba(255,0,51,0.2)] rounded-t-[2.5rem] bg-[#ff0033] overflow-hidden pointer-events-auto shrink-0">
       <div className="bg-black/10 text-white/80 py-2 text-center font-black text-[8px] tracking-[0.2em] border-b border-white/5 uppercase">
-        {isAdmin ? '🛡️ Admin Command Center' : "💎 Diamond Agency Network"}
+        {isAdmin ? '🛡️ Admin Command Center' : `💎 ${appSettings.brandName} Network`}
       </div>
       
       <nav className="flex justify-around items-center py-5 px-4 bg-[#ff0033]">
@@ -239,10 +241,13 @@ export const BottomNav = () => {
 const PageWrapper = ({ children, title, showNav = true, showHeader = true, showBack = false, footerAction = null }) => {
   const { appSettings, loading } = useCart();
   const { user } = useAuth();
+  const navigate = useNavigate();
   
+  const isAuthPage = window.location.pathname === '/login' || window.location.pathname === '/signup';
+
   if (loading) return null;
 
-  if (appSettings.maintenanceMode && user?.role !== 'admin') {
+  if (appSettings.maintenanceMode && user?.role !== 'admin' && !isAuthPage) {
     return (
       <div className="flex flex-col h-screen w-full bg-white items-center justify-center p-10 text-center space-y-6">
         <div className="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center animate-pulse">
@@ -250,8 +255,15 @@ const PageWrapper = ({ children, title, showNav = true, showHeader = true, showB
         </div>
         <h1 className="text-2xl font-black uppercase tracking-tighter italic">System Maintenance</h1>
         <p className="text-xs font-bold text-gray-400 uppercase tracking-widest leading-relaxed">
-          Diamond Agency is currently undergoing scheduled system synchronization. We will be back shortly.
+          {appSettings.brandName} is currently undergoing scheduled system synchronization. We will be back shortly.
         </p>
+        {/* Allow admins to reach login even during maintenance */}
+        <button 
+          onClick={() => navigate('/login')}
+          className="text-[10px] font-black uppercase text-gray-300 hover:text-red-600 transition-colors"
+        >
+          Admin Login Bypass
+        </button>
       </div>
     );
   }
