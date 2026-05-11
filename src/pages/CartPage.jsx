@@ -9,14 +9,17 @@ import PaymentModal from '../components/PaymentModal';
 
 const CartPage = () => {
   const navigate = useNavigate();
-  const { cart, removeFromCart, clearCart, cartTotal, confirmPurchase } = useCart();
+  const { cart, removeFromCart, clearCart, cartTotal, confirmPurchase, appSettings } = useCart();
   const { user } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const { activePayment } = usePayment();
 
+  const hasKeralaItems = cart.some(item => (item.title || "").toUpperCase().includes('KERALA'));
+  const keralaOverrideActive = hasKeralaItems && appSettings?.keralaSalesClosed;
+
   const handlePay = () => {
-    if (cart.length === 0) return;
+    if (cart.length === 0 || keralaOverrideActive) return;
     setShowPayment(true);
   };
 
@@ -42,10 +45,10 @@ const CartPage = () => {
     <div className="w-full flex gap-3">
       <button 
         onClick={handlePay}
-        disabled={isProcessing || cart.length === 0}
-        className="flex-1 bg-[#ff0033] text-white py-4 rounded-2xl flex items-center justify-center gap-2 font-black text-sm shadow-[0_15px_30px_-5px_rgba(255,0,85,0.4)] active:scale-95 transition-all disabled:opacity-50 border-b-4 border-black/10"
+        disabled={isProcessing || cart.length === 0 || keralaOverrideActive}
+        className={`flex-1 text-white py-4 rounded-2xl flex items-center justify-center gap-2 font-black text-sm shadow-[0_15px_30px_-5px_rgba(255,0,85,0.4)] active:scale-95 transition-all disabled:opacity-50 border-b-4 border-black/10 ${keralaOverrideActive ? 'bg-gray-400' : 'bg-[#ff0033]'}`}
       >
-        <ShoppingCart size={20} fill="white" /> {isProcessing ? 'Waiting...' : 'Confirm Pay'}
+        <ShoppingCart size={20} fill="white" /> {isProcessing ? 'Waiting...' : (keralaOverrideActive ? 'Sales Closed' : 'Confirm Pay')}
       </button>
       
       <button 
@@ -65,6 +68,19 @@ const CartPage = () => {
            <ShoppingCart size={24} fill="white" />
            <span className="text-xl font-black uppercase tracking-tight font-serif">Your Cart</span>
         </div>
+
+        {/* Kerala Override Warning */}
+        {keralaOverrideActive && (
+          <div className="w-full max-w-sm bg-red-50 border border-red-200 p-4 rounded-2xl mb-6 flex flex-col items-center text-center gap-2">
+            <ShoppingCart className="text-red-600 animate-bounce" size={24} />
+            <p className="text-[10px] font-black text-red-600 uppercase tracking-widest">
+              Action Required: Kerala Sales Closed
+            </p>
+            <p className="text-[8px] font-bold text-gray-500 leading-relaxed uppercase">
+              Administrator has manually closed ticket sales for Kerala Lottery. Please remove Kerala items from your cart to proceed with other purchases.
+            </p>
+          </div>
+        )}
 
         {/* Cart Table */}
         <div className="w-full max-w-sm mb-8 overflow-hidden px-1">

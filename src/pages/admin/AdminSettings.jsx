@@ -208,6 +208,34 @@ const AdminSettings = () => {
                </div>
             </SettingRow>
 
+            <SettingRow label="Kerala Lottery Sales Control" desc="Manually close Kerala ticket sales earlier than result declaration.">
+               <div className="flex items-center justify-between bg-red-50/50 border border-red-100 rounded-2xl p-5">
+                  <div className="flex items-center gap-4">
+                     {appSettings.keralaSalesClosed ? (
+                       <Lock className="text-red-500" size={24} />
+                     ) : (
+                       <Zap className="text-emerald-500" size={24} />
+                     )}
+                     <div>
+                        <p className="text-xs font-black text-gray-800 uppercase tracking-tight">
+                           {appSettings.keralaSalesClosed ? 'Kerala Sales CLOSED' : 'Kerala Sales OPEN'}
+                        </p>
+                        <p className="text-[8px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">
+                           {appSettings.keralaSalesClosed ? 'Early closure active. Users cannot buy Kerala tickets.' : 'Standard timing rules apply to Kerala Lottery.'}
+                        </p>
+                     </div>
+                  </div>
+                  <button
+                     onClick={() => updateAppSettings({ keralaSalesClosed: !appSettings.keralaSalesClosed })}
+                     className="relative inline-flex items-center cursor-pointer transition-all"
+                  >
+                     <div className={`w-16 h-8 rounded-full transition-all ${appSettings.keralaSalesClosed ? 'bg-red-500' : 'bg-gray-200'}`}>
+                        <div className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow-md transition-all ${appSettings.keralaSalesClosed ? 'left-9' : 'left-1'}`}></div>
+                     </div>
+                  </button>
+               </div>
+            </SettingRow>
+
             <GeneralSettingsWithContext />
           </div>
          )}

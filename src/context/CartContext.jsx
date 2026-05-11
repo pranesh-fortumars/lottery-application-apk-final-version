@@ -40,7 +40,8 @@ export const CartProvider = ({ children }) => {
     jackpotVisible: true,
     maintenanceMode: false,
     brandName: 'DIAMOND AGENCY',
-    sessionPersistence: '04 HOURS (STANDARD)'
+    sessionPersistence: '04 HOURS (STANDARD)',
+    keralaSalesClosed: false
   });
   const [loading, setLoading] = React.useState(true);
 
@@ -340,6 +341,13 @@ export const CartProvider = ({ children }) => {
     // If not prepaid, check balance
     if (!isPrepaid && user.balance < totalCost) {
       alert("Insufficient Balance!");
+      return;
+    }
+
+    // Safety Override Check for Kerala
+    const hasKerala = cart.some(item => (item.title || "").toUpperCase().includes('KERALA'));
+    if (hasKerala && appSettings?.keralaSalesClosed) {
+      alert("Kerala Lottery sales are currently closed by the administrator.");
       return;
     }
 

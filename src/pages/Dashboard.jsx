@@ -78,13 +78,18 @@ const Dashboard = () => {
     return diffInMinutes <= 15;
   };
 
-  const games = DRAW_SLOTS.map(game => ({
-    time: game.time,
-    name: game.brand,
-    type: game.brand.toLowerCase(),
-    id: game.id,
-    closed: isClosed(game.time)
-  }));
+  const games = DRAW_SLOTS.map(game => {
+    const isKerala = game.brand.toUpperCase() === 'KERALA';
+    const forceClosed = isKerala && appSettings.keralaSalesClosed;
+    
+    return {
+      time: game.time,
+      name: game.brand,
+      type: game.brand.toLowerCase(),
+      id: game.id,
+      closed: forceClosed || isClosed(game.time)
+    };
+  });
 
   return (
     <div className="bg-[#f9f9f9]">

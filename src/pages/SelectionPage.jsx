@@ -37,7 +37,9 @@ const SelectionPage = () => {
     return diffInMinutes <= 0; // Exactly at draw time
   };
 
-  const closed = isClosed(drawTime);
+  const isKerala = marketName.toUpperCase() === 'KERALA';
+  const forceClosed = isKerala && appSettings?.keralaSalesClosed;
+  const closed = forceClosed || isClosed(drawTime);
 
   const abcTiers = [
     { price: "12.00", win: "₹ 6250, 250, 25" },
@@ -60,7 +62,7 @@ const SelectionPage = () => {
       disabled={closed}
       className={`w-full text-white py-4 rounded-2xl flex items-center justify-center gap-3 font-black text-xl shadow-[0_15px_30px_-5px_rgba(255,0,85,0.4)] relative active:scale-95 transition-all ${closed ? 'bg-gray-400' : 'bg-[#ff0055]'}`}
     >
-      <ShoppingCart size={24} fill="white" /> {closed ? 'Closed' : 'PAY NOW'}
+      <ShoppingCart size={24} fill="white" /> {closed ? (forceClosed ? 'SALES CLOSED' : 'EXPIRED') : 'PAY NOW'}
       {cart.length > 0 && !closed && (
          <span className="absolute -top-3 -right-3 bg-black text-white w-8 h-8 rounded-full text-[12px] flex items-center justify-center border-[3px] border-white font-black shadow-lg">{cart.length}</span>
       )}
@@ -82,8 +84,8 @@ const SelectionPage = () => {
               <h2 className="text-white text-xl font-black font-condensed italic">{drawTime}</h2>
            </div>
            <div className="text-right">
-              <span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-white shadow-inner ${closed ? 'text-black' : 'text-[#ff004d]'}`}>
-                {closed ? 'EXPIRED' : 'OPEN'}
+              <span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-white shadow-inner ${closed ? (forceClosed ? 'text-red-600' : 'text-black') : 'text-[#ff004d]'}`}>
+                {closed ? (forceClosed ? 'SALES CLOSED' : 'EXPIRED') : 'OPEN'}
               </span>
            </div>
         </div>
@@ -177,8 +179,14 @@ const SelectionPage = () => {
           {closed && (
             <div className="bg-red-50 p-6 rounded-3xl border border-red-100 text-center space-y-2">
                 <Lock className="mx-auto text-red-500 mb-2" size={32} />
-                <p className="text-red-600 font-black uppercase text-xs tracking-widest">Booking Finished</p>
-                <p className="text-gray-400 text-[10px] font-bold">Registration for this draw is officially closed. Please check the next available slot.</p>
+                <p className="text-red-600 font-black uppercase text-xs tracking-widest">
+                  {forceClosed ? 'Ticket Sales Closed' : 'Booking Finished'}
+                </p>
+                <p className="text-gray-400 text-[10px] font-bold">
+                  {forceClosed 
+                    ? 'The administrator has manually closed ticket sales for this Kerala slot.' 
+                    : 'Registration for this draw is officially closed. Please check the next available slot.'}
+                </p>
             </div>
           )}
         </div>
