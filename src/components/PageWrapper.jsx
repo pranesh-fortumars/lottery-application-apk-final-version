@@ -243,6 +243,12 @@ const PageWrapper = ({ children, title, showNav = true, showHeader = true, showB
   const { appSettings, loading } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (appSettings.brandName) {
+      document.title = appSettings.brandName;
+    }
+  }, [appSettings.brandName]);
   
   const isAuthPage = window.location.pathname === '/login' || window.location.pathname === '/signup';
 
