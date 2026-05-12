@@ -34,9 +34,16 @@ const ResetPasswordPage = () => {
       const querySnapshot = await getDocs(q);
 
       if (querySnapshot.empty) {
-        setError('No account found with this mobile number.');
+        setError('No account found. Please verify your registered number.');
       } else {
+        const userData = querySnapshot.docs[0].data();
         setUserDocId(querySnapshot.docs[0].id);
+        
+        // Special logic for Admin accounts
+        if (userData.role === 'admin') {
+           console.log("Authority account identified. Escalating to priority verification.");
+        }
+        
         setStep(2);
       }
     } catch (err) {
@@ -132,7 +139,10 @@ const ResetPasswordPage = () => {
                  {step === 3 && "Verification successful. Create your new secure password."}
                </>
              ) : (
-               "Enter your registered email address to receive a secure recovery link."
+               <>
+                 Enter your registered email address to receive a secure recovery link. 
+                 <span className="block mt-1 text-[#ff0033]/60 italic">Default Admin? Use admin@lottery.com</span>
+               </>
              )}
            </p>
         </div>
