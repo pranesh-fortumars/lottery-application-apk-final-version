@@ -305,7 +305,10 @@ export const CartProvider = ({ children }) => {
         });
 
         if (balanceAdj !== 0) {
-          batch.update(doc(db, 'users', user.uid), { balance: increment(balanceAdj) });
+          batch.update(doc(db, 'users', user.uid), { 
+            winningBalance: increment(balanceAdj),
+            balance: increment(balanceAdj) 
+          });
           addNotification({ 
             userId: user.uid, 
             title: balanceAdj > 0 ? '🏆 WINNER!' : '⚠️ ADJUSTMENT', 
@@ -401,9 +404,24 @@ export const CartProvider = ({ children }) => {
           });
         });
 
-        // Deduct balance ONLY if NOT prepaid
+        // Smart Deduction: Use Deposited Balance first, then Winnings
+        const deposited = user.depositedBalance || 0;
+        const winnings = user.winningBalance || 0;
         const userRef = doc(db, 'users', user.uid);
-        batch.update(userRef, { balance: increment(-totalCost) });
+
+        if (deposited >= totalCost) {
+          batch.update(userRef, { 
+            depositedBalance: increment(-totalCost),
+            balance: increment(-totalCost)
+          });
+        } else {
+          const remaining = totalCost - deposited;
+          batch.update(userRef, { 
+            depositedBalance: 0,
+            winningBalance: increment(-remaining),
+            balance: increment(-totalCost)
+          });
+        }
       }
 
       await batch.commit();

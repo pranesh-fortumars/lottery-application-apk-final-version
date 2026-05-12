@@ -49,7 +49,10 @@ const AdminApprovals = () => {
 
       if (tx.type === 'topup') {
         const userRef = doc(db, 'users', tx.userId);
-        batch.update(userRef, { balance: increment(tx.amount) });
+        batch.update(userRef, { 
+          depositedBalance: increment(tx.amount),
+          balance: increment(tx.amount) 
+        });
       } else if (tx.type === 'purchase' && tx.cartItems) {
         const now = new Date();
         const purchaseDate = now.toISOString().split('T')[0];

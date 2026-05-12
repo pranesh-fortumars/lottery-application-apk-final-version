@@ -71,6 +71,7 @@ const ProfilePage = () => {
   const menuItems = [
     !isAdmin && { icon: <Ticket size={20} />, label: 'My Tickets', color: 'text-green-500', path: '/tickets' },
     !isAdmin && { icon: <Wallet size={20} />, label: 'Wallet Top Up', color: 'text-blue-500', path: '/topup' },
+    !isAdmin && { icon: <Zap size={20} />, label: 'Request Withdrawal', color: 'text-emerald-500', path: '/withdraw' },
     { icon: <History size={20} />, label: 'Transaction History', color: 'text-purple-500', path: isAdmin ? '/admin/reports' : '/tickets' },
     { icon: <Settings size={20} />, label: 'Settings', color: 'text-gray-500', path: isAdmin ? '/admin/settings' : '/settings' },
   ].filter(Boolean);
@@ -111,22 +112,36 @@ const ProfilePage = () => {
             </div>
          </div>
 
-         {/* Quick Balance Section - Hidden for Admins */}
+         {/* Triple-Balance Management Card */}
          {!isAdmin && (
            <div className="px-6 -mt-10 relative z-20">
-              <div className="bg-white rounded-[2rem] p-6 shadow-2xl border border-gray-100 flex items-center justify-between group active:scale-95 transition-all cursor-pointer" onClick={() => navigate('/topup')}>
-                 <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-red-50 text-[#ff0033] rounded-2xl flex items-center justify-center shadow-sm">
-                       <Wallet size={24} />
+              <div className="bg-white rounded-[2.5rem] shadow-2xl border border-gray-100 overflow-hidden">
+                 {/* Top: Total Balance */}
+                 <div className="p-8 bg-gray-50/50 border-b border-gray-100 flex items-center justify-between group cursor-pointer active:bg-gray-100 transition-all" onClick={() => navigate('/topup')}>
+                    <div className="flex items-center gap-5">
+                       <div className="w-14 h-14 bg-[#ff0033] text-white rounded-[1.4rem] flex items-center justify-center shadow-lg shadow-red-500/20 group-hover:rotate-6 transition-transform">
+                          <Wallet size={28} />
+                       </div>
+                       <div>
+                          <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] leading-none mb-1.5">Total Available Balance</p>
+                          <p className="text-3xl font-black text-gray-900 italic tracking-tighter">₹ {user?.balance?.toLocaleString() || '0.00'}</p>
+                       </div>
                     </div>
-                    <div>
-                       <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Total Balance</p>
-                       <p className="text-2xl font-black text-gray-900 italic tracking-tighter shadow-black drop-shadow-sm">₹ {user?.balance?.toLocaleString() || '0.00'}</p>
-                    </div>
+                    <ChevronRight size={24} className="text-gray-200 group-hover:text-[#ff0033] transition-all" />
                  </div>
-                 <div className="bg-[#ff0033] p-2 rounded-xl text-white shadow-lg group-hover:px-4 transition-all overflow-hidden flex items-center gap-1 group-hover:rotate-6">
-                    <span className="text-[10px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Add</span>
-                    <CreditCard size={18} fill="white" />
+
+                 {/* Bottom Split: Deposited vs Winnings */}
+                 <div className="grid grid-cols-2 divide-x divide-gray-100">
+                    <div className="p-6 flex flex-col items-center text-center group cursor-pointer hover:bg-red-50/30 transition-all" onClick={() => navigate('/topup')}>
+                       <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-2">Deposited Chips</p>
+                       <p className="text-lg font-black text-gray-800 italic">₹ {user?.depositedBalance?.toLocaleString() || '0.00'}</p>
+                       <span className="mt-2 text-[7px] font-black bg-gray-100 text-gray-400 px-2 py-0.5 rounded-full uppercase tracking-tighter">Purchase Only</span>
+                    </div>
+                    <div className="p-6 flex flex-col items-center text-center group cursor-pointer hover:bg-emerald-50/30 transition-all" onClick={() => navigate('/withdraw')}>
+                       <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-2">Winning Credits</p>
+                       <p className="text-lg font-black text-emerald-600 italic">₹ {user?.winningBalance?.toLocaleString() || '0.00'}</p>
+                       <span className="mt-2 text-[7px] font-black bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full uppercase tracking-tighter animate-pulse">Withdrawable</span>
+                    </div>
                  </div>
               </div>
            </div>

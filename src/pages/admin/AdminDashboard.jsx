@@ -111,8 +111,24 @@ const AdminDashboard = () => {
               <span className="font-black text-white italic text-xl">₹</span>
            </div>
            <div className="text-left">
-              <h3 className="font-black text-lg uppercase tracking-tight leading-none italic">Manage Transactions</h3>
+              <h3 className="font-black text-lg uppercase tracking-tight leading-none italic">Manage Payments</h3>
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/70 mt-1">Review pending topups & payments</p>
+           </div>
+        </div>
+        <ChevronRight size={24} className="text-white/50" />
+      </button>
+
+      <button 
+        onClick={() => { window.location.href = '/admin/withdrawals'; }}
+        className="w-full bg-emerald-600 text-white p-5 rounded-3xl shadow-[0_10px_30px_-10px_rgba(5,150,105,0.5)] flex items-center justify-between mt-4 active:scale-95 transition-all"
+      >
+        <div className="flex items-center gap-4">
+           <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+              <Landmark size={24} className="text-white" />
+           </div>
+           <div className="text-left">
+              <h3 className="font-black text-lg uppercase tracking-tight leading-none italic">Withdrawal Requests</h3>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/70 mt-1">Process payout requests from users</p>
            </div>
         </div>
         <ChevronRight size={24} className="text-white/50" />

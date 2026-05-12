@@ -20,6 +20,7 @@ import CartPage from './pages/CartPage';
 import ProfilePage from './pages/ProfilePage';
 import MyTickets from './pages/MyTickets';
 import TopUpPage from './pages/TopUpPage';
+import WithdrawPage from './pages/WithdrawPage';
 
 import PageWrapper from './components/PageWrapper';
 import AdminLayout from './components/AdminLayout';
@@ -31,6 +32,7 @@ import AdminUserDetails from './pages/admin/AdminUserDetails';
 import AdminReports from './pages/admin/AdminReports';
 import AdminSettings from './pages/admin/AdminSettings';
 import AdminApprovals from './pages/admin/AdminApprovals';
+import AdminWithdrawals from './pages/admin/AdminWithdrawals';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { PaymentProvider } from './context/PaymentContext';
@@ -108,6 +110,7 @@ const AnimatedRoutes = () => {
           <Route path="/jackpot" element={<ProtectedRoute role="user"><JackpotPage /></ProtectedRoute>} />
           <Route path="/tickets" element={<ProtectedRoute role="user"><MyTickets /></ProtectedRoute>} />
           <Route path="/topup" element={<ProtectedRoute role="user"><TopUpPage /></ProtectedRoute>} />
+          <Route path="/withdraw" element={<ProtectedRoute role="user"><WithdrawPage /></ProtectedRoute>} />
           
           {/* Admin Routes */}
           <Route path="/admin" element={<ProtectedRoute role="admin"><AdminLayout><AdminDashboard /></AdminLayout></ProtectedRoute>} />
@@ -118,6 +121,7 @@ const AnimatedRoutes = () => {
           <Route path="/admin/reports" element={<ProtectedRoute role="admin"><AdminLayout><AdminReports /></AdminLayout></ProtectedRoute>} />
           <Route path="/admin/settings" element={<ProtectedRoute role="admin"><AdminLayout><AdminSettings /></AdminLayout></ProtectedRoute>} />
           <Route path="/admin/approvals" element={<ProtectedRoute role="admin"><AdminLayout><AdminApprovals /></AdminLayout></ProtectedRoute>} />
+          <Route path="/admin/withdrawals" element={<ProtectedRoute role="admin"><AdminLayout><AdminWithdrawals /></AdminLayout></ProtectedRoute>} />
           
           <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
