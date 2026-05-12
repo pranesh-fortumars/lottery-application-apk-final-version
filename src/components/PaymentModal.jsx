@@ -7,6 +7,7 @@ const PaymentModal = ({ isOpen, onClose, amount, onConfirm }) => {
   const { activePayment } = usePayment();
   const [copied, setCopied] = React.useState(false);
   const [showInput, setShowInput] = React.useState(false);
+  const [hasStarted, setHasStarted] = React.useState(false);
   const [transactionId, setTransactionId] = React.useState('');
   const [userUpiId, setUserUpiId] = React.useState('');
 
@@ -28,8 +29,8 @@ const PaymentModal = ({ isOpen, onClose, amount, onConfirm }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={onClose}
-          className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+          onClick={hasStarted ? undefined : onClose}
+          className={`absolute inset-0 bg-black/80 backdrop-blur-sm ${hasStarted ? 'cursor-not-allowed' : 'cursor-pointer'}`}
         />
 
         {/* Modal */}
@@ -41,12 +42,14 @@ const PaymentModal = ({ isOpen, onClose, amount, onConfirm }) => {
         >
           {/* Header */}
           <div className="bg-[#ff0033] p-6 text-white relative">
-            <button 
-              onClick={onClose}
-              className="absolute top-6 right-6 p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors"
-            >
-              <X size={20} />
-            </button>
+            {!hasStarted && (
+              <button 
+                onClick={onClose}
+                className="absolute top-6 right-6 p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors"
+              >
+                <X size={20} />
+              </button>
+            )}
             <div className="flex items-center gap-3 mb-2">
               <QrCode size={24} />
               <h3 className="text-xl font-black uppercase italic tracking-tighter">Payment Required</h3>
@@ -93,20 +96,27 @@ const PaymentModal = ({ isOpen, onClose, amount, onConfirm }) => {
             <div className="grid grid-cols-1 gap-3">
               {!showInput ? (
                 <>
-                  <a 
-                    href={`upi://pay?pa=${activePayment.upiId}&pn=Admin&am=${amount}&cu=INR`}
+                  <button 
+                    onClick={() => {
+                      setHasStarted(true);
+                      setShowInput(true);
+                      window.location.href = `upi://pay?pa=${activePayment.upiId}&pn=Admin&am=${amount}&cu=INR`;
+                    }}
                     className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 active:scale-95 transition-all text-center flex items-center justify-center gap-2"
                   >
                     Open UPI App
-                  </a>
+                  </button>
                   <button 
-                    onClick={() => setShowInput(true)}
+                    onClick={() => {
+                      setHasStarted(true);
+                      setShowInput(true);
+                    }}
                     className="w-full bg-[#ff0033] text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-red-500/20 active:scale-95 transition-all"
                   >
                     I Have Paid
                   </button>
                   <button 
-                    onClick={() => { setShowInput(false); onClose(); }}
+                    onClick={onClose}
                     className="w-full bg-gray-100 text-gray-400 py-4 rounded-2xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all"
                   >
                     Cancel
@@ -142,19 +152,22 @@ const PaymentModal = ({ isOpen, onClose, amount, onConfirm }) => {
                       if (!transactionId.trim()) return alert("Please enter Transaction ID");
                       onConfirm(transactionId, userUpiId);
                       setShowInput(false);
+                      setHasStarted(false); // Reset for next use
                       setTransactionId('');
                       setUserUpiId('');
                     }}
-                    className="w-full bg-[#ff0033] text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-red-500/20 active:scale-95 transition-all"
+                    className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 active:scale-95 transition-all"
                   >
                     Submit Transaction
                   </button>
-                  <button 
-                    onClick={() => setShowInput(false)}
-                    className="w-full bg-gray-100 text-gray-400 py-4 rounded-2xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all"
-                  >
-                    Back
-                  </button>
+                  {!hasStarted && (
+                    <button 
+                      onClick={() => setShowInput(false)}
+                      className="w-full bg-gray-100 text-gray-400 py-4 rounded-2xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all"
+                    >
+                      Back
+                    </button>
+                  )}
                 </div>
               )}
             </div>
