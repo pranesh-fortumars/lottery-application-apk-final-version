@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
-  ArrowLeft, 
-  Wallet, 
-  History, 
-  ShieldAlert, 
-  Mail, 
+  ArrowLeft,
+  Wallet,
+  History,
+  ShieldAlert,
+  Mail,
   Phone,
   Edit,
   Activity,
@@ -13,8 +13,17 @@ import {
   ChevronRight,
   ShieldCheck,
   Zap,
-  Star
+  Star,
+  User,
+  Trophy,
+  Info,
+  ChevronLeft,
+  X,
+  Key
 } from 'lucide-react';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { auth } from '../../firebase';
+import { motion, AnimatePresence } from 'framer-motion';
 import { doc, getDoc, collection, query, where, getDocs, orderBy, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 
@@ -25,6 +34,9 @@ const AdminUserDetails = () => {
   const [activity, setActivity] = useState([]);
   const [stats, setStats] = useState({ tickets: 0, won: 0 });
   const [loading, setLoading] = useState(true);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editData, setEditData] = useState({ name: '', mobile: '', email: '' });
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -34,6 +46,11 @@ const AdminUserDetails = () => {
         if (userDoc.exists()) {
           const userData = { id: userDoc.id, ...userDoc.data() };
           setUser(userData);
+          setEditData({
+            name: userData.name || '',
+            mobile: userData.mobile || '',
+            email: userData.email || ''
+          });
 
           // Fetch user tickets for stats and activity - Removed orderBy to avoid index errors
           const ticketsQuery = query(collection(db, 'tickets'), where('userId', '==', userId));
@@ -104,6 +121,38 @@ const AdminUserDetails = () => {
     } catch (error) {
       console.error("Error deleting user:", error);
       alert("Failed to delete user profile.");
+    }
+  };
+
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    setUpdating(true);
+    try {
+      await updateDoc(doc(db, 'users', userId), editData);
+      setUser(prev => ({ ...prev, ...editData }));
+      setShowEditModal(false);
+      alert("Profile updated successfully!");
+    } catch (error) {
+      console.error("Update error:", error);
+      alert("Failed to update profile.");
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleSendResetEmail = async () => {
+    if (!user.email) {
+      alert("No email address associated with this profile.");
+      return;
+    }
+    if (!window.confirm(`Send password reset email to ${user.email}?`)) return;
+
+    try {
+      await sendPasswordResetEmail(auth, user.email);
+      alert("Reset link sent successfully!");
+    } catch (error) {
+      console.error("Reset error:", error);
+      alert("Error: " + error.message);
     }
   };
 
@@ -252,10 +301,20 @@ const AdminUserDetails = () => {
             >
               {user.status === 'Blocked' ? 'Unrestrict Entity' : 'Restrict Entity'}
             </button>
-            <button className="flex-1 bg-gray-900 text-white py-5 rounded-2xl font-black text-[11px] uppercase tracking-widest active:scale-95 shadow-xl shadow-black/10 transition-all flex items-center justify-center gap-2">
+            <button 
+              onClick={() => setShowEditModal(true)}
+              className="flex-1 bg-gray-900 text-white py-5 rounded-2xl font-black text-[11px] uppercase tracking-widest active:scale-95 shadow-xl shadow-black/10 transition-all flex items-center justify-center gap-2"
+            >
                Edit Profile <Edit size={16} className="text-[#f42464]" />
             </button>
          </div>
+         
+         <button 
+           onClick={handleSendResetEmail}
+           className="w-full bg-blue-600/10 border-2 border-blue-600/20 text-blue-600 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-blue-600 hover:text-white transition-all active:scale-95 shadow-lg flex items-center justify-center gap-2"
+         >
+           <Key size={16} /> Request Password Reset
+         </button>
          
          <button 
            onClick={handleDeleteUser}
@@ -264,6 +323,74 @@ const AdminUserDetails = () => {
            Purge Profile Identity
          </button>
       </div>
+      
+      {/* Edit Profile Modal */}
+      <AnimatePresence>
+        {showEditModal && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-end justify-center p-4 pb-10"
+            onClick={() => setShowEditModal(false)}
+          >
+            <motion.div 
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="bg-white w-full max-w-[480px] rounded-[2.5rem] p-10 shadow-2xl space-y-8 relative overflow-hidden"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex justify-between items-start border-b border-gray-50 pb-8">
+                <div>
+                   <div className="flex items-center gap-3 mb-2">
+                       <Edit className="text-[#f42464]" size={24} />
+                       <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tighter italic leading-none">Modify Profile</h2>
+                   </div>
+                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Updating global identity records</p>
+                </div>
+                <button 
+                  onClick={() => setShowEditModal(false)}
+                  className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-400 active:bg-red-50 active:text-red-500 transition-all border border-gray-100"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+
+              <form onSubmit={handleUpdateProfile} className="space-y-5">
+                {[
+                  { label: 'Full Name', key: 'name', icon: User, type: 'text' },
+                  { label: 'Mobile Number', key: 'mobile', icon: Phone, type: 'tel' },
+                  { label: 'Email Address', key: 'email', icon: Mail, type: 'email' },
+                ].map((field) => (
+                  <div key={field.key} className="space-y-1.5">
+                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">{field.label}</label>
+                    <div className="relative group/field">
+                      <field.icon className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within/field:text-[#f42464] transition-colors" size={18} />
+                      <input 
+                        required
+                        type={field.type} 
+                        value={editData[field.key]}
+                        onChange={e => setEditData({...editData, [field.key]: e.target.value})}
+                        className="w-full h-15 bg-gray-50/50 border border-gray-100 rounded-2xl pl-16 pr-6 outline-none font-bold text-gray-800 focus:bg-white focus:border-[#f42464]/20 transition-all text-xs"
+                      />
+                    </div>
+                  </div>
+                ))}
+
+                <button 
+                  type="submit"
+                  disabled={updating}
+                  className="w-full h-16 bg-gray-900 text-white rounded-2xl font-black text-[12px] uppercase tracking-widest shadow-xl shadow-black/20 flex items-center justify-center gap-3 mt-6 active:scale-95 transition-all disabled:opacity-50"
+                >
+                   {updating ? 'Synchronizing...' : 'Save Changes'}
+                </button>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       
       <div className="pt-10 text-center opacity-30">
          <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.3em] italic">Full Trace Audit Record #{user.id.slice(0, 6)}</p>
