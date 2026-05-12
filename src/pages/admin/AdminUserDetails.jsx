@@ -125,12 +125,12 @@ const AdminUserDetails = () => {
   };
 
   const handleAdjustBalance = async (type, isAddition) => {
-    const amount = window.prompt(`Enter amount to ${isAddition ? 'ADD' : 'SUBTRACT'} ${type === 'deposited' ? 'Deposited Chips' : 'Winning Credits'}:`);
+    const amount = window.prompt(`Enter amount to ${isAddition ? 'ADD' : 'SUBTRACT'} ${type === 'deposited' ? 'Deposited Chips' : type === 'winning' ? 'Winning Credits' : 'Bonus Chips'}:`);
     const val = parseFloat(amount);
     if (isNaN(val) || val <= 0) return;
 
     const finalVal = isAddition ? val : -val;
-    const field = type === 'deposited' ? 'depositedBalance' : 'winningBalance';
+    const field = type === 'deposited' ? 'depositedBalance' : type === 'winning' ? 'winningBalance' : 'bonusBalance';
     
     try {
       await updateDoc(doc(db, 'users', userId), {
@@ -242,10 +242,10 @@ const AdminUserDetails = () => {
              <span className="text-4xl font-black italic tracking-tighter">₹ {(user.balance || 0).toLocaleString()}</span>
           </div>
           
-          <div className="grid grid-cols-2 gap-6 mt-10 pt-10 border-t border-white/5">
+          <div className="grid grid-cols-3 gap-6 mt-10 pt-10 border-t border-white/5">
              <div className="space-y-3">
                 <div>
-                   <p className="text-[9px] font-black uppercase tracking-widest text-gray-500 mb-1">Deposited Chips</p>
+                   <p className="text-[9px] font-black uppercase tracking-widest text-gray-500 mb-1">Deposited</p>
                    <p className="text-xl font-black italic">₹ {(user.depositedBalance || 0).toLocaleString()}</p>
                 </div>
                 <div className="flex gap-2">
@@ -255,12 +255,22 @@ const AdminUserDetails = () => {
              </div>
              <div className="space-y-3">
                 <div>
-                   <p className="text-[9px] font-black uppercase tracking-widest text-gray-500 mb-1">Winning Credits</p>
+                   <p className="text-[9px] font-black uppercase tracking-widest text-gray-500 mb-1">Winning</p>
                    <p className="text-xl font-black text-emerald-400 italic">₹ {(user.winningBalance || 0).toLocaleString()}</p>
                 </div>
                 <div className="flex gap-2">
                    <button onClick={() => handleAdjustBalance('winning', true)} className="bg-white/10 hover:bg-emerald-500/20 p-2 rounded-lg text-emerald-400 transition-colors"><Zap size={14} fill="currentColor" /></button>
                    <button onClick={() => handleAdjustBalance('winning', false)} className="bg-white/10 hover:bg-red-500/20 p-2 rounded-lg text-red-400 transition-colors"><X size={14} /></button>
+                </div>
+             </div>
+             <div className="space-y-3">
+                <div>
+                   <p className="text-[9px] font-black uppercase tracking-widest text-gray-500 mb-1">Bonus</p>
+                   <p className="text-xl font-black text-blue-400 italic">₹ {(user.bonusBalance || 0).toLocaleString()}</p>
+                </div>
+                <div className="flex gap-2">
+                   <button onClick={() => handleAdjustBalance('bonus', true)} className="bg-white/10 hover:bg-emerald-500/20 p-2 rounded-lg text-emerald-400 transition-colors"><Zap size={14} fill="currentColor" /></button>
+                   <button onClick={() => handleAdjustBalance('bonus', false)} className="bg-white/10 hover:bg-red-500/20 p-2 rounded-lg text-red-400 transition-colors"><X size={14} /></button>
                 </div>
              </div>
           </div>

@@ -342,9 +342,10 @@ export const CartProvider = ({ children }) => {
     if (cart.length === 0 || !user) return;
     
     const totalCost = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    const totalAvailable = (user.depositedBalance || 0) + (user.winningBalance || 0) + (user.bonusBalance || 0);
     
     // If not prepaid, check balance
-    if (!isPrepaid && user.balance < totalCost) {
+    if (!isPrepaid && totalAvailable < totalCost) {
       alert("Insufficient Balance!");
       return;
     }
@@ -404,24 +405,53 @@ export const CartProvider = ({ children }) => {
           });
         });
 
-        // Smart Deduction: Use Deposited Balance first, then Winnings
+        // Smart Deduction Strategy:
+        // 1. Bonus Balance (Restricted - Use first)
+        // 2. Deposited Balance
+        // 3. Winning Balance
+        
+        let remainingToDeduct = totalCost;
+        const bonus = user.bonusBalance || 0;
         const deposited = user.depositedBalance || 0;
         const winnings = user.winningBalance || 0;
-        const userRef = doc(db, 'users', user.uid);
+        
+        let newBonus = bonus;
+        let newDeposited = deposited;
+        let newWinnings = winnings;
 
-        if (deposited >= totalCost) {
-          batch.update(userRef, { 
-            depositedBalance: increment(-totalCost),
-            balance: increment(-totalCost)
-          });
+        // Step 1: Deduct from Bonus
+        if (newBonus >= remainingToDeduct) {
+          newBonus -= remainingToDeduct;
+          remainingToDeduct = 0;
         } else {
-          const remaining = totalCost - deposited;
-          batch.update(userRef, { 
-            depositedBalance: 0,
-            winningBalance: increment(-remaining),
-            balance: increment(-totalCost)
-          });
+          remainingToDeduct -= newBonus;
+          newBonus = 0;
         }
+
+        // Step 2: Deduct from Deposited
+        if (remainingToDeduct > 0) {
+          if (newDeposited >= remainingToDeduct) {
+            newDeposited -= remainingToDeduct;
+            remainingToDeduct = 0;
+          } else {
+            remainingToDeduct -= newDeposited;
+            newDeposited = 0;
+          }
+        }
+
+        // Step 3: Deduct from Winnings
+        if (remainingToDeduct > 0) {
+          newWinnings -= remainingToDeduct;
+          remainingToDeduct = 0;
+        }
+
+        const userRef = doc(db, 'users', user.uid);
+        batch.update(userRef, { 
+          bonusBalance: newBonus,
+          depositedBalance: newDeposited,
+          winningBalance: newWinnings,
+          balance: increment(-totalCost)
+        });
       }
 
       await batch.commit();

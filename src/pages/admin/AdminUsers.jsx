@@ -141,6 +141,7 @@ const AdminUsers = () => {
                       <div className="flex flex-col items-end gap-0.5">
                          <span className="text-[7px] font-black uppercase text-gray-400">Dep: ₹{(user.depositedBalance || 0).toLocaleString()}</span>
                          <span className="text-[7px] font-black uppercase text-emerald-500">Win: ₹{(user.winningBalance || 0).toLocaleString()}</span>
+                         <span className="text-[7px] font-black uppercase text-blue-500">Bon: ₹{(user.bonusBalance || 0).toLocaleString()}</span>
                       </div>
                     </div>
                     <ChevronRight size={20} className="text-gray-100 group-hover:text-[#f42464] transition-colors" />

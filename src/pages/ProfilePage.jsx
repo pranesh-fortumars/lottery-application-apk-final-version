@@ -11,7 +11,8 @@ import {
   Users,
   Gift,
   Zap,
-  Copy
+  Copy,
+  AlertCircle
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import PageWrapper from '../components/PageWrapper';
@@ -130,53 +131,66 @@ const ProfilePage = () => {
                     <ChevronRight size={24} className="text-gray-200 group-hover:text-[#ff0033] transition-all" />
                  </div>
 
-                 {/* Bottom Split: Deposited vs Winnings */}
-                 <div className="grid grid-cols-2 divide-x divide-gray-100">
-                    <div className="p-6 flex flex-col items-center text-center group cursor-pointer hover:bg-red-50/30 transition-all" onClick={() => navigate('/topup')}>
-                       <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-2">Deposited Chips</p>
-                       <p className="text-lg font-black text-gray-800 italic">₹ {user?.depositedBalance?.toLocaleString() || '0.00'}</p>
-                       <span className="mt-2 text-[7px] font-black bg-gray-100 text-gray-400 px-2 py-0.5 rounded-full uppercase tracking-tighter">Purchase Only</span>
-                    </div>
-                    <div className="p-6 flex flex-col items-center text-center group cursor-pointer hover:bg-emerald-50/30 transition-all" onClick={() => navigate('/withdraw')}>
-                       <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-2">Winning Credits</p>
-                       <p className="text-lg font-black text-emerald-600 italic">₹ {user?.winningBalance?.toLocaleString() || '0.00'}</p>
-                       <span className="mt-2 text-[7px] font-black bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full uppercase tracking-tighter animate-pulse">Withdrawable</span>
-                    </div>
-                 </div>
-              </div>
-           </div>
-         )}
+                  {/* Bottom Split: Deposited vs Winnings vs Bonus */}
+                  <div className="grid grid-cols-3 divide-x divide-gray-100">
+                     <div className="p-4 flex flex-col items-center text-center group cursor-pointer hover:bg-red-50/30 transition-all" onClick={() => navigate('/topup')}>
+                        <p className="text-[7px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Deposit</p>
+                        <p className="text-sm font-black text-gray-800 italic">₹ {user?.depositedBalance?.toLocaleString() || '0'}</p>
+                        <span className="mt-1.5 text-[6px] font-black bg-gray-100 text-gray-400 px-1.5 py-0.5 rounded-full uppercase tracking-tighter">Purchase</span>
+                     </div>
+                     <div className="p-4 flex flex-col items-center text-center group cursor-pointer hover:bg-emerald-50/30 transition-all" onClick={() => navigate('/withdraw')}>
+                        <p className="text-[7px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Winning</p>
+                        <p className="text-sm font-black text-emerald-600 italic">₹ {user?.winningBalance?.toLocaleString() || '0'}</p>
+                        <span className="mt-1.5 text-[6px] font-black bg-emerald-100 text-emerald-600 px-1.5 py-0.5 rounded-full uppercase tracking-tighter">Payout</span>
+                     </div>
+                     <div className="p-4 flex flex-col items-center text-center group cursor-pointer hover:bg-blue-50/30 transition-all">
+                        <p className="text-[7px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Bonus</p>
+                        <p className="text-sm font-black text-blue-600 italic">₹ {user?.bonusBalance?.toLocaleString() || '0'}</p>
+                        <span className="mt-1.5 text-[6px] font-black bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-full uppercase tracking-tighter">Tickets Only</span>
+                     </div>
+                  </div>
+               </div>
+            </div>
+          )}
 
-         {/* Referral Section - Hidden for Admins */}
-         {!isAdmin && (
-           <div className="p-6">
-              <div className="bg-gray-950 rounded-[2.5rem] p-8 text-white relative overflow-hidden group shadow-xl">
-                 <div className="absolute top-0 right-0 w-32 h-32 bg-[#ff0033]/20 rounded-full blur-3xl group-hover:bg-[#ff0033]/40 transition-colors"></div>
-                 <div className="relative z-10">
-                    <div className="flex items-center gap-3 mb-4">
-                       <Gift className="text-[#ff0033]" size={24} />
-                       <h3 className="text-xl font-black font-condensed uppercase tracking-tighter italic italic">Refer & Get Chips</h3>
-                    </div>
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-relaxed mb-6">
-                       Invite your friends and both of you will receive <span className="text-white">BONUS CHIPS</span> to buy free tickets!
-                    </p>
-                    
-                    <div className="flex items-center gap-3 bg-white/5 p-4 rounded-2xl border border-white/10 group-hover:border-[#ff0033]/30 transition-all">
-                       <div className="flex-grow">
-                          <p className="text-[8px] font-black text-[#ff0033] uppercase tracking-widest mb-1">Your Referral Code</p>
-                          <p className="text-lg font-black tracking-tighter italic">DIAMOND777</p>
-                       </div>
-                       <button 
-                         onClick={handleCopyCode}
-                         className="bg-[#ff0033] p-3 rounded-xl text-white shadow-lg shadow-[#ff0033]/20 active:scale-95 transition-all"
-                       >
-                          <Copy size={18} />
-                       </button>
-                    </div>
-                 </div>
-              </div>
-           </div>
-         )}
+          {/* Referral Section - Hidden for Admins */}
+          {!isAdmin && (
+            <div className="p-6">
+               <div className="bg-gray-950 rounded-[2.5rem] p-8 text-white relative overflow-hidden group shadow-xl">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-[#ff0033]/20 rounded-full blur-3xl group-hover:bg-[#ff0033]/40 transition-colors"></div>
+                  <div className="relative z-10">
+                     <div className="flex items-center gap-3 mb-4">
+                        <Gift className="text-[#ff0033]" size={24} />
+                        <h3 className="text-xl font-black font-condensed uppercase tracking-tighter italic italic">Refer & Get ₹50</h3>
+                     </div>
+                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-relaxed mb-6">
+                        Share the link below. When your friends register with code <span className="text-white">LOTTERY777</span>, they get <span className="text-[#ff0033]">₹50 BONUS CHIPS</span> instantly!
+                     </p>
+                     
+                     <div className="flex items-center gap-3 bg-white/5 p-4 rounded-2xl border border-white/10 group-hover:border-[#ff0033]/30 transition-all">
+                        <div className="flex-grow overflow-hidden">
+                           <p className="text-[8px] font-black text-[#ff0033] uppercase tracking-widest mb-1">Your Referral Link</p>
+                           <p className="text-[10px] font-bold tracking-tight text-gray-400 truncate">{window.location.origin}/signup?ref=LOTTERY777</p>
+                        </div>
+                        <button 
+                          onClick={() => {
+                            navigator.clipboard.writeText(`${window.location.origin}/signup?ref=LOTTERY777`);
+                            alert('Referral link copied!');
+                          }}
+                          className="bg-[#ff0033] p-3 rounded-xl text-white shadow-lg shadow-[#ff0033]/20 active:scale-95 transition-all shrink-0"
+                        >
+                           <Copy size={18} />
+                        </button>
+                     </div>
+                     
+                     <div className="mt-4 flex items-center gap-2 p-3 bg-blue-500/10 rounded-xl border border-blue-500/20">
+                        <AlertCircle size={14} className="text-blue-400" />
+                        <p className="text-[8px] font-bold text-blue-300 uppercase tracking-widest">Bonus chips are non-withdrawable and for tickets only.</p>
+                     </div>
+                  </div>
+               </div>
+            </div>
+          )}
 
         {/* Menu Items */}
         <div className="p-4 py-6 space-y-4">

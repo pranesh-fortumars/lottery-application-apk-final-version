@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import PageWrapper from '../components/PageWrapper';
-import { User, Phone, Users, ChevronRight, Lock, AlertCircle, Mail } from 'lucide-react';
+import { User, Phone, Users, ChevronRight, Lock, AlertCircle, Mail, Gift } from 'lucide-react';
 
 const SignupPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { signup } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     mobile: '',
     password: '',
-    referral: ''
+    referral: searchParams.get('ref') || ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -121,17 +122,25 @@ const SignupPage = () => {
           </div>
 
           {/* Referral Code Input */}
-          <div className="flex border border-gray-200 rounded-2xl overflow-hidden h-14 bg-gray-50/50 shadow-sm focus-within:border-red-200 transition-all">
-            <div className="bg-gray-100/50 px-5 flex items-center justify-center border-r border-gray-100 text-gray-400">
-               <Users size={18} />
+          <div className="space-y-2">
+            <div className="flex border border-gray-200 rounded-2xl overflow-hidden h-14 bg-gray-50/50 shadow-sm focus-within:border-red-200 transition-all">
+              <div className="bg-gray-100/50 px-5 flex items-center justify-center border-r border-gray-100 text-gray-400">
+                <Users size={18} />
+              </div>
+              <input 
+                className="flex-grow px-4 outline-none border-none focus:ring-0 text-sm font-bold text-gray-700 bg-transparent placeholder:text-gray-300" 
+                placeholder="Referral code (Optional)" 
+                type="text"
+                value={formData.referral}
+                onChange={(e) => setFormData({...formData, referral: e.target.value})}
+              />
             </div>
-            <input 
-              className="flex-grow px-4 outline-none border-none focus:ring-0 text-sm font-bold text-gray-700 bg-transparent placeholder:text-gray-300" 
-              placeholder="Referral code (Optional)" 
-              type="text"
-              value={formData.referral}
-              onChange={(e) => setFormData({...formData, referral: e.target.value})}
-            />
+            {formData.referral.toUpperCase() === 'LOTTERY777' && (
+              <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-xl border border-emerald-100 animate-pulse">
+                <Gift size={14} className="text-emerald-500" />
+                <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Referral Active: ₹50 BONUS UNLOCKED!</p>
+              </div>
+            )}
           </div>
 
           <div className="pt-6 space-y-4">

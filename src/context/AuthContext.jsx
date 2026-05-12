@@ -51,7 +51,10 @@ export const AuthProvider = ({ children }) => {
               email: firebaseUser.email,
               role: 'user',
               name: firebaseUser.displayName || 'User',
-              balance: 0
+              balance: 0,
+              depositedBalance: 0,
+              winningBalance: 0,
+              bonusBalance: 0
             });
           }
         } catch (err) {
@@ -72,13 +75,21 @@ export const AuthProvider = ({ children }) => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const firebaseUser = userCredential.user;
       
+      const isReferralValid = additionalData.referral?.toUpperCase() === 'LOTTERY777';
+      const bonus = isReferralValid ? 50 : 0;
+
       // Save additional user data to Firestore
       const userData = {
         name: additionalData.name || '',
         mobile: additionalData.mobile || '',
         referral: additionalData.referral || '',
+        referralApplied: isReferralValid,
         role: 'user',
-        balance: 0, // Initial balance set to zero
+        depositedBalance: 0,
+        winningBalance: 0,
+        bonusBalance: bonus,
+        balance: bonus, // Initial total balance
+        status: 'Active',
         createdAt: new Date().toISOString()
       };
       
