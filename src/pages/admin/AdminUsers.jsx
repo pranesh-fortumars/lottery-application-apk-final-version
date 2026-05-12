@@ -49,6 +49,8 @@ const AdminUsers = () => {
         name: newUser.name,
         email: newUser.email,
         mobile: newUser.mobile,
+        depositedBalance: newUser.balance ? parseInt(newUser.balance) : 0,
+        winningBalance: 0,
         balance: newUser.balance ? parseInt(newUser.balance) : 0,
         status: 'Active',
         role: 'user',
@@ -133,16 +135,16 @@ const AdminUsers = () => {
                        <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">{user.mobile || 'No Mobile'}</p>
                     </div>
                  </div>
-                 <div className="text-right flex items-center gap-4 relative z-10">
+                  <div className="text-right flex items-center gap-4 relative z-10">
                     <div className="space-y-1">
-                      <p className="font-black text-emerald-600 text-base italic">₹{(user.balance || 0).toLocaleString()}</p>
-                      <div className="flex items-center justify-end gap-1.5">
-                         <span className={`w-1.5 h-1.5 rounded-full ${user.status === 'Active' ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`}></span>
-                         <span className="text-[7px] font-black uppercase tracking-widest text-gray-400">{user.status || 'Active'}</span>
+                      <p className="font-black text-gray-900 text-sm italic leading-none">₹{(user.balance || 0).toLocaleString()}</p>
+                      <div className="flex flex-col items-end gap-0.5">
+                         <span className="text-[7px] font-black uppercase text-gray-400">Dep: ₹{(user.depositedBalance || 0).toLocaleString()}</span>
+                         <span className="text-[7px] font-black uppercase text-emerald-500">Win: ₹{(user.winningBalance || 0).toLocaleString()}</span>
                       </div>
                     </div>
                     <ChevronRight size={20} className="text-gray-100 group-hover:text-[#f42464] transition-colors" />
-                 </div>
+                  </div>
               </motion.div>
             )) : (
               <div className="text-center py-10 opacity-30">

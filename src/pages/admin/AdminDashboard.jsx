@@ -9,7 +9,8 @@ import {
   ArrowDownRight,
   ChevronRight,
   Target,
-  Zap
+  Zap,
+  Landmark
 } from 'lucide-react';
 import { getAllUsers, subscribeToResults, getTickets } from '../../services/firebaseService';
 
