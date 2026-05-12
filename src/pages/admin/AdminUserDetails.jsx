@@ -15,7 +15,7 @@ import {
   Zap,
   Star
 } from 'lucide-react';
-import { doc, getDoc, collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs, orderBy, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 
 const AdminUserDetails = () => {
@@ -78,6 +78,34 @@ const AdminUserDetails = () => {
 
     fetchUserData();
   }, [userId]);
+
+  const handleToggleBlock = async () => {
+    if (!user) return;
+    const newStatus = user.status === 'Blocked' ? 'Active' : 'Blocked';
+    if (!window.confirm(`Are you sure you want to ${newStatus === 'Blocked' ? 'BLOCK' : 'UNBLOCK'} this user?`)) return;
+
+    try {
+      await updateDoc(doc(db, 'users', userId), { status: newStatus });
+      setUser(prev => ({ ...prev, status: newStatus }));
+      alert(`User identity has been set to ${newStatus}.`);
+    } catch (error) {
+      console.error("Error toggling block status:", error);
+      alert("Failed to update user status.");
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!window.confirm("CRITICAL WARNING: This will permanently purge this user profile from the database. This action is IRREVERSIBLE. Proceed?")) return;
+
+    try {
+      await deleteDoc(doc(db, 'users', userId));
+      alert("User profile successfully purged from the system.");
+      navigate('/admin/users');
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      alert("Failed to delete user profile.");
+    }
+  };
 
   if (loading) {
     return (
@@ -212,12 +240,28 @@ const AdminUserDetails = () => {
       </div>
 
       {/* Global Actions */}
-      <div className="flex gap-4">
-         <button className="flex-1 bg-white border-2 border-[#ff004d]/20 text-[#ff004d] py-5 rounded-2xl font-black text-[11px] uppercase tracking-widest active:bg-[#fce4ec] shadow-xl shadow-red-500/5 transition-all">
-            Restrict Entity
-         </button>
-         <button className="flex-1 bg-gray-900 text-white py-5 rounded-2xl font-black text-[11px] uppercase tracking-widest active:scale-95 shadow-xl shadow-black/10 transition-all flex items-center justify-center gap-2">
-            Edit Profile <Edit size={16} className="text-[#f42464]" />
+      <div className="flex flex-col gap-4">
+         <div className="flex gap-4">
+            <button 
+              onClick={handleToggleBlock}
+              className={`flex-1 py-5 rounded-2xl font-black text-[11px] uppercase tracking-widest active:scale-95 shadow-xl transition-all flex items-center justify-center gap-2 ${
+                user.status === 'Blocked' 
+                  ? 'bg-emerald-500 text-white shadow-emerald-500/10' 
+                  : 'bg-white border-2 border-[#ff004d]/20 text-[#ff004d] shadow-red-500/5'
+              }`}
+            >
+              {user.status === 'Blocked' ? 'Unrestrict Entity' : 'Restrict Entity'}
+            </button>
+            <button className="flex-1 bg-gray-900 text-white py-5 rounded-2xl font-black text-[11px] uppercase tracking-widest active:scale-95 shadow-xl shadow-black/10 transition-all flex items-center justify-center gap-2">
+               Edit Profile <Edit size={16} className="text-[#f42464]" />
+            </button>
+         </div>
+         
+         <button 
+           onClick={handleDeleteUser}
+           className="w-full bg-red-600/10 border-2 border-red-600/20 text-red-600 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-red-600 hover:text-white transition-all active:scale-95 shadow-lg"
+         >
+           Purge Profile Identity
          </button>
       </div>
       

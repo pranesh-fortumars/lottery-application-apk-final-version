@@ -24,12 +24,22 @@ export const AuthProvider = ({ children }) => {
 
   React.useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      setLoading(true); // Always signal loading when auth state starts shifting
+      setLoading(true);
       if (firebaseUser) {
         try {
           const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
           if (userDoc.exists()) {
             const userData = userDoc.data();
+            
+            // SECURITY GATE: Automatic logout for blocked entities
+            if (userData.status === 'Blocked') {
+              console.warn("Blocked user attempt detected. Terminating session...");
+              await signOut(auth);
+              setUser(null);
+              setLoading(false);
+              return;
+            }
+
             setUser({
               uid: firebaseUser.uid,
               email: firebaseUser.email,
