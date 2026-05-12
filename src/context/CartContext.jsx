@@ -42,6 +42,7 @@ export const CartProvider = ({ children }) => {
     brandName: 'SMS Lottery',
     sessionPersistence: '04 HOURS (STANDARD)',
     keralaSalesClosed: false,
+    globalSalesClosed: false,
     customerCare: '+91 00000 00000'
   });
   const [loading, setLoading] = React.useState(true);
@@ -342,6 +343,12 @@ export const CartProvider = ({ children }) => {
     // If not prepaid, check balance
     if (!isPrepaid && user.balance < totalCost) {
       alert("Insufficient Balance!");
+      return;
+    }
+
+    // Global Safety Override
+    if (appSettings?.globalSalesClosed) {
+      alert("Ticket booking is currently closed for today by the administrator.");
       return;
     }
 

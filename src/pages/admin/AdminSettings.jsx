@@ -482,6 +482,34 @@ const AdminSettings = () => {
                </div>
             </SettingRow>
 
+            <SettingRow label="Global Ticket Sales" desc="Master switch to instantly disable ALL ticket bookings across the platform.">
+               <div className="flex items-center justify-between bg-gray-900 border border-gray-800 rounded-2xl p-5 text-white shadow-xl">
+                  <div className="flex items-center gap-4">
+                     {appSettings.globalSalesClosed ? (
+                       <Shield className="text-red-500" size={24} />
+                     ) : (
+                       <Zap className="text-emerald-500" size={24} />
+                     )}
+                     <div>
+                        <p className="text-xs font-black uppercase tracking-tight">
+                           {appSettings.globalSalesClosed ? 'Booking Blocked' : 'Booking Active'}
+                        </p>
+                        <p className="text-[8px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">
+                           {appSettings.globalSalesClosed ? 'Users cannot purchase any tickets' : 'Global ticket intake is operational'}
+                        </p>
+                     </div>
+                  </div>
+                  <button
+                     onClick={() => updateAppSettings({ globalSalesClosed: !appSettings.globalSalesClosed })}
+                     className="relative inline-flex items-center cursor-pointer transition-all"
+                  >
+                     <div className={`w-16 h-8 rounded-full transition-all ${appSettings.globalSalesClosed ? 'bg-red-500' : 'bg-gray-700'}`}>
+                        <div className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow-md transition-all ${appSettings.globalSalesClosed ? 'left-9' : 'left-1'}`}></div>
+                     </div>
+                  </button>
+               </div>
+            </SettingRow>
+
             <SettingRow label="Kerala Lottery Sales Control" desc="Manually close Kerala ticket sales earlier than result declaration.">
                <div className="flex items-center justify-between bg-red-50/50 border border-red-100 rounded-2xl p-5">
                   <div className="flex items-center gap-4">

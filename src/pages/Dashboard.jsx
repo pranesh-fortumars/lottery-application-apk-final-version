@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Diamond, QrCode } from 'lucide-react';
+import { Mail, Diamond, QrCode, Shield } from 'lucide-react';
 import { usePayment } from '../context/PaymentContext';
 import { useCart } from '../context/CartContext';
 import { DRAW_SLOTS } from '../constants/lotteryConfig';
@@ -80,7 +80,8 @@ const Dashboard = () => {
 
   const games = DRAW_SLOTS.map(game => {
     const isKerala = game.brand.toUpperCase() === 'KERALA';
-    const forceClosed = isKerala && appSettings.keralaSalesClosed;
+    const globalLock = appSettings.globalSalesClosed;
+    const forceClosed = (isKerala && appSettings.keralaSalesClosed) || globalLock;
     
     return {
       time: game.time,
@@ -103,6 +104,18 @@ const Dashboard = () => {
           />
         </div>
       </div>
+
+      {/* Global Sales Closed Banner */}
+      {appSettings.globalSalesClosed && (
+        <div className="px-4 mt-2">
+           <div className="bg-black border-2 border-red-600 p-6 rounded-[2rem] flex flex-col items-center justify-center text-center shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-red-600/10 rounded-full blur-2xl -mr-12 -mt-12"></div>
+              <Shield className="text-red-600 mb-2 animate-bounce" size={32} />
+              <h3 className="text-white font-black text-lg uppercase tracking-tighter italic italic">Sales Closed For Today</h3>
+              <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-1">Administrator has manually suspended all ticket intake</p>
+           </div>
+        </div>
+      )}
 
       {/* Red Promo Bar - Exactly like Image 1 with text */}
       {jackpotVisible && (

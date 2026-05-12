@@ -38,7 +38,8 @@ const SelectionPage = () => {
   };
 
   const isKerala = marketName.toUpperCase() === 'KERALA';
-  const forceClosed = isKerala && appSettings?.keralaSalesClosed;
+  const globalLock = appSettings?.globalSalesClosed;
+  const forceClosed = (isKerala && appSettings?.keralaSalesClosed) || globalLock;
   const closed = forceClosed || isClosed(drawTime);
 
   const abcTiers = [
@@ -180,12 +181,14 @@ const SelectionPage = () => {
             <div className="bg-red-50 p-6 rounded-3xl border border-red-100 text-center space-y-2">
                 <Lock className="mx-auto text-red-500 mb-2" size={32} />
                 <p className="text-red-600 font-black uppercase text-xs tracking-widest">
-                  {forceClosed ? 'Ticket Sales Closed' : 'Booking Finished'}
+                  {globalLock ? 'GLOBAL SALES CLOSED' : (forceClosed ? 'MARKET CLOSED' : 'BOOKING FINISHED')}
                 </p>
                 <p className="text-gray-400 text-[10px] font-bold">
-                  {forceClosed 
-                    ? 'The administrator has manually closed ticket sales for this Kerala slot.' 
-                    : 'Registration for this draw is officially closed. Please check the next available slot.'}
+                  {globalLock 
+                    ? 'Ticket booking is currently closed for today across all markets by the administrator.'
+                    : (forceClosed 
+                        ? `The administrator has manually closed ticket sales for this ${marketName} slot.` 
+                        : 'Registration for this draw is officially closed. Please check the next available slot.')}
                 </p>
             </div>
           )}
