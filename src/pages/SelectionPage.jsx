@@ -12,8 +12,12 @@ const SelectionPage = () => {
   const { cart, appSettings } = useCart();
   
   const slotData = getSlotById(gameId);
-  const drawTime = slotData?.time || '01:00 PM';
   const marketName = slotData?.brand || 'DEAR';
+  const isKerala = marketName.toUpperCase() === 'KERALA';
+  const earlyClosure = isKerala && appSettings?.keralaSalesClosed;
+  
+  // If Early Closure is ON, override the display time to 02:00 PM
+  const drawTime = earlyClosure ? '02:00 PM' : (slotData?.time || '01:00 PM');
   
   const getGameName = () => `${marketName} LOTTERY`;
   
@@ -37,9 +41,8 @@ const SelectionPage = () => {
     return diffInMinutes <= 0; // Exactly at draw time
   };
 
-  const isKerala = marketName.toUpperCase() === 'KERALA';
   const globalLock = appSettings?.globalSalesClosed;
-  const forceClosed = (isKerala && appSettings?.keralaSalesClosed) || globalLock;
+  const forceClosed = earlyClosure || globalLock;
   const closed = forceClosed || isClosed(drawTime);
 
   const abcTiers = [

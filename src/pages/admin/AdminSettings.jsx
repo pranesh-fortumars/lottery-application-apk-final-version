@@ -509,8 +509,8 @@ const AdminSettings = () => {
                   </button>
                </div>
             </SettingRow>
+            <SettingRow label="Kerala Early Closure (2 PM)" desc="Force Kerala sales to end early at 02:00 PM instead of the standard 03:00 PM.">
 
-            <SettingRow label="Kerala Lottery Sales Control" desc="Manually close Kerala ticket sales earlier than result declaration.">
                <div className="flex items-center justify-between bg-red-50/50 border border-red-100 rounded-2xl p-5">
                   <div className="flex items-center gap-4">
                      {appSettings.keralaSalesClosed ? (

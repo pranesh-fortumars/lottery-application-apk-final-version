@@ -81,14 +81,18 @@ const Dashboard = () => {
   const games = DRAW_SLOTS.map(game => {
     const isKerala = game.brand.toUpperCase() === 'KERALA';
     const globalLock = appSettings.globalSalesClosed;
-    const forceClosed = (isKerala && appSettings.keralaSalesClosed) || globalLock;
+    const forceClosed = isKerala && appSettings.keralaSalesClosed;
+    
+    // If Kerala early closure is ON, force time to 02:00 PM for logic and display
+    const effectiveTime = (isKerala && forceClosed) ? '02:00 PM' : game.time;
     
     return {
-      time: game.time,
+      time: effectiveTime,
+      originalTime: game.time,
       name: game.brand,
       type: game.brand.toLowerCase(),
       id: game.id,
-      closed: forceClosed || isClosed(game.time)
+      closed: globalLock || forceClosed || isClosed(effectiveTime)
     };
   });
 
