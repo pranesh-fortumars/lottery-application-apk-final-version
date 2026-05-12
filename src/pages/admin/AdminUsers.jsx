@@ -51,6 +51,7 @@ const AdminUsers = () => {
         mobile: newUser.mobile,
         depositedBalance: newUser.balance ? parseInt(newUser.balance) : 0,
         winningBalance: 0,
+        bonusBalance: 0,
         balance: newUser.balance ? parseInt(newUser.balance) : 0,
         status: 'Active',
         role: 'user',
