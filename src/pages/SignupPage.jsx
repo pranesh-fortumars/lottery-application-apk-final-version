@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import PageWrapper from '../components/PageWrapper';
-import { User, Phone, Users, ChevronRight, Lock, AlertCircle } from 'lucide-react';
+import { User, Phone, Users, ChevronRight, Lock, AlertCircle, Mail } from 'lucide-react';
 
 const SignupPage = () => {
   const navigate = useNavigate();
   const { signup } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
+    email: '',
     mobile: '',
     password: '',
     referral: ''
@@ -31,11 +32,12 @@ const SignupPage = () => {
     }
 
     setLoading(true);
-    // Create a virtual email from mobile number
-    const virtualEmail = `${formData.mobile}@lottery.com`;
+    // Use real email if provided, otherwise virtual email
+    const loginEmail = formData.email || `${formData.mobile}@lottery.com`;
     
-    const result = await signup(virtualEmail, formData.password, {
+    const result = await signup(loginEmail, formData.password, {
       name: formData.name,
+      email: formData.email || '',
       mobile: formData.mobile,
       referral: formData.referral
     });
@@ -71,6 +73,20 @@ const SignupPage = () => {
               required
               value={formData.name}
               onChange={(e) => setFormData({...formData, name: e.target.value})}
+            />
+          </div>
+
+          {/* Email Input (Optional/Recommended) */}
+          <div className="flex border border-gray-200 rounded-2xl overflow-hidden h-14 bg-gray-50/50 shadow-sm focus-within:border-red-200 transition-all">
+            <div className="bg-gray-100/50 px-5 flex items-center justify-center border-r border-gray-100 text-gray-400">
+               <Mail className="text-gray-400" size={18} />
+            </div>
+            <input 
+              className="flex-grow px-4 outline-none border-none focus:ring-0 text-sm font-bold text-gray-700 bg-transparent placeholder:text-gray-300" 
+              placeholder="Email Address (For Secure Recovery)" 
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
             />
           </div>
 

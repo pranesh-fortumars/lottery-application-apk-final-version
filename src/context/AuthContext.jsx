@@ -126,6 +126,26 @@ export const AuthProvider = ({ children }) => {
       }
       
       console.error("Login error:", error);
+
+      // Check for Mobile Reset Sync
+      const mobileMatch = email.match(/^(\d{10})@/);
+      if (mobileMatch) {
+        const mobile = mobileMatch[1];
+        const q = query(collection(db, 'users'), where('mobile', '==', mobile));
+        const snap = await getDocs(q);
+        
+        if (!snap.empty) {
+          const userData = snap.docs[0].data();
+          // If a temp password exists from an OTP reset, and it matches what was entered
+          if (userData.passwordUpdateRequested && userData.tempPassword === password) {
+             return { 
+               success: false, 
+               message: "OTP VERIFICATION SYNC: Your new password is set in the system but needs one-time Admin activation. Please contact support." 
+             };
+          }
+        }
+      }
+
       let message = "Invalid ID or Password. Please try again.";
       if (error.code === 'auth/network-request-failed') message = "Network error. Check your connection.";
       
