@@ -16,16 +16,20 @@ import {
   CheckCircle,
   AlertCircle,
   Eye,
-  EyeOff
+  EyeOff,
+  Trash2, 
+  RotateCcw, 
+  AlertTriangle,
+  Phone,
+  Mail
 } from 'lucide-react';
 import { usePayment } from '../../context/PaymentContext';
 import { subscribeToAppSettings, updateAppSettings } from '../../services/firebaseService';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
-import { doc, updateDoc } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { doc, updateDoc, collection, getDocs, deleteDoc, writeBatch, query } from 'firebase/firestore';
+import { db, auth } from '../../firebase';
 import { sendPasswordResetEmail } from 'firebase/auth';
-import { auth } from '../../firebase';
 
 const SettingRow = ({ label, desc, children }) => (
   <div className="flex flex-col justify-between items-start py-8 gap-4 first:pt-4 last:pb-4 border-b border-gray-50 last:border-none group">
@@ -137,8 +141,12 @@ const MyProfileSettings = () => {
   const [localUser, setLocalUser] = useState({
     name: user?.name || '',
     mobile: user?.mobile || '',
-    email: user?.email || ''
+    email: user?.email || '',
+    notifications: user?.notifications !== false,
+    securityAlerts: user?.securityAlerts !== false
   });
+  const [newPassword, setNewPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -146,17 +154,24 @@ const MyProfileSettings = () => {
       setLocalUser({
         name: user.name || '',
         mobile: user.mobile || '',
-        email: user.email || ''
+        email: user.email || '',
+        notifications: user.notifications !== false,
+        securityAlerts: user.securityAlerts !== false
       });
     }
   }, [user]);
 
   const handleSave = async () => {
-    if (!user?.uid) return;
     setSaving(true);
     try {
-      await updateDoc(doc(db, 'users', user.uid), localUser);
-      alert("Your profile has been synchronized successfully!");
+      const updates = { ...localUser };
+      if (newPassword) {
+        updates.tempPassword = newPassword;
+        updates.passwordUpdateRequested = true;
+      }
+      await updateDoc(doc(db, 'users', user.uid), updates);
+      alert("Administrative Identity Synchronized!");
+      setNewPassword('');
     } catch (error) {
       console.error("Profile sync error:", error);
       alert("Failed to sync profile data.");
@@ -193,7 +208,7 @@ const MyProfileSettings = () => {
 
       <SettingRow label="Direct Hotline" desc="Registered mobile number for high-priority alerts.">
         <div className="relative">
-          <Globe className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-200" size={20} />
+          <Phone className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-200" size={20} />
           <input 
             type="tel" 
             value={localUser.mobile} 
@@ -203,21 +218,62 @@ const MyProfileSettings = () => {
         </div>
       </SettingRow>
 
-      <SettingRow label="Security Credentials" desc="Manage your access credentials and password security.">
-         <div className="space-y-3">
-            <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100 flex items-center justify-between">
-               <div>
-                  <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-1">Authenticated Email</p>
-                  <p className="text-xs font-black text-gray-800">{user?.email}</p>
-               </div>
-               <Shield className="text-emerald-500" size={20} />
-            </div>
+      <SettingRow label="Authority Email" desc="The primary contact for standards-based recovery and reporting.">
+        <div className="relative">
+          <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-200" size={20} />
+          <input 
+            type="email" 
+            value={localUser.email} 
+            onChange={(e) => setLocalUser(prev => ({ ...prev, email: e.target.value }))}
+            className="bg-gray-50/50 border border-gray-100 rounded-2xl pl-16 pr-6 h-16 font-black text-gray-800 outline-none w-full text-xs focus:bg-white focus:border-[#ff004d]/20 transition-all uppercase tracking-widest" 
+          />
+        </div>
+      </SettingRow>
+
+      <SettingRow label="Quick Password Update" desc="Directly set a new administrative password (requires sync).">
+        <div className="space-y-3">
+          <div className="relative">
+            <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-200" size={20} />
+            <input 
+              type={showPassword ? "text" : "password"} 
+              value={newPassword} 
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="Enter New Password"
+              className="bg-gray-50/50 border border-gray-100 rounded-2xl pl-16 pr-14 h-16 font-black text-gray-800 outline-none w-full text-xs focus:bg-white focus:border-[#ff004d]/20 transition-all uppercase tracking-widest" 
+            />
             <button 
-              onClick={handlePasswordReset}
-              className="w-full h-16 bg-white border-2 border-[#ff004d]/20 text-[#ff004d] rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-[#ff004d] hover:text-white transition-all flex items-center justify-center gap-2"
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-300 hover:text-[#ff004d]"
             >
-               <Lock size={16} /> Request Secure Reset
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
+          </div>
+          <button 
+            onClick={handlePasswordReset}
+            className="w-full py-4 bg-white border border-gray-100 text-[9px] font-black uppercase tracking-widest text-gray-400 rounded-xl hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
+          >
+             <Key size={14} /> Traditional Email Reset
+          </button>
+        </div>
+      </SettingRow>
+
+      <SettingRow label="Authority Alerts" desc="Configure high-priority notification channels for administrative events.">
+         <div className="grid grid-cols-2 gap-4">
+            <div 
+              onClick={() => setLocalUser(prev => ({ ...prev, notifications: !prev.notifications }))}
+              className={`p-5 rounded-2xl border transition-all cursor-pointer flex flex-col items-center gap-2 ${localUser.notifications ? 'bg-emerald-50 border-emerald-100 text-emerald-700' : 'bg-gray-50 border-gray-100 text-gray-400 opacity-50'}`}
+            >
+               <Bell size={24} />
+               <span className="text-[9px] font-black uppercase tracking-widest">Push Alerts</span>
+            </div>
+            <div 
+              onClick={() => setLocalUser(prev => ({ ...prev, securityAlerts: !prev.securityAlerts }))}
+              className={`p-5 rounded-2xl border transition-all cursor-pointer flex flex-col items-center gap-2 ${localUser.securityAlerts ? 'bg-blue-50 border-blue-100 text-blue-700' : 'bg-gray-50 border-gray-100 text-gray-400 opacity-50'}`}
+            >
+               <Shield size={24} />
+               <span className="text-[9px] font-black uppercase tracking-widest">Security</span>
+            </div>
          </div>
       </SettingRow>
 
@@ -229,6 +285,103 @@ const MyProfileSettings = () => {
           >
             {saving ? 'SYNCHRONIZING...' : 'Commit Identity Changes'}
          </button>
+      </div>
+    </div>
+  );
+};
+
+const DatabaseCleanseSettings = () => {
+  const [loading, setLoading] = useState(false);
+  const [confirmText, setConfirmText] = useState('');
+
+  const handleFactoryReset = async () => {
+    if (confirmText !== 'AUTHORIZE CLEANSE') {
+      alert("Please type 'AUTHORIZE CLEANSE' to confirm this destructive action.");
+      return;
+    }
+
+    if (!window.confirm("CRITICAL WARNING: This will permanently delete ALL ticket history, results, and transactions. This cannot be undone. PROCEED?")) return;
+
+    setLoading(true);
+    try {
+      const collectionsToClear = ['tickets', 'results', 'announcements', 'pending_transactions', 'notifications'];
+      
+      for (const collName of collectionsToClear) {
+        const q = query(collection(db, collName));
+        const snapshot = await getDocs(q);
+        
+        const batchSize = 500;
+        for (let i = 0; i < snapshot.docs.length; i += batchSize) {
+          const batch = writeBatch(db);
+          const chunk = snapshot.docs.slice(i, i + batchSize);
+          chunk.forEach(doc => batch.delete(doc.ref));
+          await batch.commit();
+        }
+      }
+      
+      alert("PLATFORM CLEANSE COMPLETE: The system has been restored to a clean state.");
+      setConfirmText('');
+    } catch (error) {
+      console.error("Cleanse error:", error);
+      alert("An error occurred during the cleanse process. Check console for details.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-8 py-4">
+      <div className="bg-red-50 p-8 rounded-[2.5rem] border border-red-100 space-y-6">
+        <div className="flex items-center gap-4 text-red-600">
+           <AlertTriangle size={32} />
+           <div>
+              <h3 className="text-lg font-black uppercase tracking-tighter italic">Factory Reset Protocol</h3>
+              <p className="text-[10px] font-bold uppercase tracking-widest opacity-70">Destructive Operational Clearance</p>
+           </div>
+        </div>
+
+        <div className="space-y-4">
+           <p className="text-xs font-bold text-red-800 leading-relaxed italic bg-white/50 p-4 rounded-2xl">
+             This action will purge ALL operational records from the following databases:
+             <span className="block mt-2 font-black uppercase tracking-widest text-[9px]">• Ticket Purchase History</span>
+             <span className="block font-black uppercase tracking-widest text-[9px]">• Declared Results Archive</span>
+             <span className="block font-black uppercase tracking-widest text-[9px]">• Pending & Historical Transactions</span>
+             <span className="block font-black uppercase tracking-widest text-[9px]">• Announcements & Alerts</span>
+           </p>
+
+           <div className="space-y-2">
+              <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Type 'AUTHORIZE CLEANSE' to unlock</label>
+              <input 
+                type="text"
+                value={confirmText}
+                onChange={(e) => setConfirmText(e.target.value.toUpperCase())}
+                placeholder="UNAUTHORIZED"
+                className="w-full h-16 bg-white border border-red-100 rounded-2xl px-6 font-black text-red-600 outline-none focus:ring-4 focus:ring-red-100 transition-all uppercase tracking-[0.3em] text-center"
+              />
+           </div>
+
+           <button 
+             disabled={loading || confirmText !== 'AUTHORIZE CLEANSE'}
+             onClick={handleFactoryReset}
+             className={`w-full py-5 rounded-2xl font-black text-sm uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-3 shadow-xl ${
+               confirmText === 'AUTHORIZE CLEANSE' 
+                 ? 'bg-red-600 text-white shadow-red-200 active:scale-95' 
+                 : 'bg-gray-100 text-gray-300'
+             }`}
+           >
+             {loading ? 'PURGING DATA...' : 'INITIATE CLEANSE'} <Trash2 size={20} />
+           </button>
+        </div>
+      </div>
+
+      <div className="bg-gray-50 p-8 rounded-[2.5rem] border border-gray-100 flex items-center justify-between group cursor-help">
+         <div className="flex items-center gap-4">
+            <RotateCcw className="text-blue-500" size={24} />
+            <div>
+               <h4 className="text-xs font-black uppercase tracking-tight text-gray-800">Operational Integrity</h4>
+               <p className="text-[9px] font-bold uppercase tracking-widest text-gray-400 mt-1">User balances and accounts will remain intact.</p>
+            </div>
+         </div>
       </div>
     </div>
   );
@@ -255,6 +408,7 @@ const AdminSettings = () => {
     { id: 'Profile', icon: User, label: 'My Identity' },
     { id: 'Financial', icon: CreditCard, label: 'Payment Gateway' },
     { id: 'Security', icon: Key, label: 'Security & Access' },
+    { id: 'Cleanse', icon: Trash2, label: 'Factory Reset' },
     { id: 'Integration', icon: Globe, label: 'API & External' },
   ];
 
@@ -360,9 +514,13 @@ const AdminSettings = () => {
           </div>
          )}
 
-         {activeTab === 'Profile' && (
-           <MyProfileSettings />
-         )}
+          {activeTab === 'Profile' && (
+            <MyProfileSettings />
+          )}
+
+          {activeTab === 'Cleanse' && (
+            <DatabaseCleanseSettings />
+          )}
 
          {activeTab === 'Financial' && (
            <div className="space-y-6">
