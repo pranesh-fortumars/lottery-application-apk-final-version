@@ -55,18 +55,41 @@ const ResetPasswordPage = () => {
 
   const handleEmailReset = async (e) => {
     e.preventDefault();
-    if (!identifier.includes('@')) {
-       setError('Please enter a valid email address.');
-       return;
-    }
+    if (!identifier) return;
     
     setLoading(true);
     setError('');
     try {
-      await sendPasswordResetEmail(auth, identifier);
+      let targetEmail = identifier;
+
+      // If they entered a mobile number, find their real email
+      if (/^\d{10}$/.test(identifier)) {
+        const q = query(collection(db, 'users'), where('mobile', '==', identifier));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+          const userData = snap.docs[0].data();
+          if (userData.email && userData.email.includes('@')) {
+            targetEmail = userData.email;
+          } else {
+            setError("No official email registered for this mobile. Please use the Mobile OTP method.");
+            setLoading(false);
+            return;
+          }
+        } else {
+          setError("No account identified with this mobile number.");
+          setLoading(false);
+          return;
+        }
+      }
+
+      console.log(`[Identity Dispatch] Attempting to transmit reset link to: ${targetEmail}`);
+      await sendPasswordResetEmail(auth, targetEmail);
       setSuccess(true);
     } catch (err) {
-      setError('Identity not recognized. Ensure you use the email provided at signup.');
+      console.error("[Identity Dispatch Error]:", err);
+      let errorMessage = 'Dispatch failed. Ensure you use a registered recovery email or ID.';
+      if (err.code === 'auth/user-not-found') errorMessage = "This email is not registered in our authority records.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -139,10 +162,7 @@ const ResetPasswordPage = () => {
                  {step === 3 && "Verification successful. Create your new secure password."}
                </>
              ) : (
-               <>
-                 Enter your registered email address to receive a secure recovery link. 
-                 <span className="block mt-1 text-[#ff0033]/60 italic">Default Admin? Use admin@lottery.com</span>
-               </>
+               "Enter your registered email address to receive a secure recovery link."
              )}
            </p>
         </div>
@@ -203,8 +223,8 @@ const ResetPasswordPage = () => {
                           <input 
                             required
                             className="w-full h-16 bg-gray-50 border border-gray-100 rounded-[1.5rem] pl-16 pr-6 outline-none font-bold text-gray-800 focus:bg-white focus:border-[#ff0033]/20 transition-all text-sm shadow-sm" 
-                            placeholder="Registered Email ID" 
-                            type="email"
+                            placeholder="Mobile or Registered Email" 
+                            type="text"
                             value={identifier}
                             onChange={(e) => setIdentifier(e.target.value)}
                           />
