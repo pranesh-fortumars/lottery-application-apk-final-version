@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import PageWrapper from '../components/PageWrapper';
 import { User, Phone, Users, ChevronRight, Lock, AlertCircle, Mail, Gift } from 'lucide-react';
+import { COMMON_REFERRAL_CODE } from '../constants/referralConfig';
 
 const SignupPage = () => {
   const navigate = useNavigate();
@@ -135,7 +136,7 @@ const SignupPage = () => {
                 onChange={(e) => setFormData({...formData, referral: e.target.value})}
               />
             </div>
-            {formData.referral.toUpperCase() === 'LOTTERY777' && (
+            {formData.referral.toUpperCase() === COMMON_REFERRAL_CODE && (
               <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-xl border border-emerald-100 animate-pulse">
                 <Gift size={14} className="text-emerald-500" />
                 <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Referral Active: ₹50 BONUS UNLOCKED!</p>

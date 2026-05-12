@@ -7,6 +7,7 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
+import { COMMON_REFERRAL_CODE } from '../constants/referralConfig';
 
 const AuthContext = React.createContext();
 
@@ -75,7 +76,7 @@ export const AuthProvider = ({ children }) => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const firebaseUser = userCredential.user;
       
-      const isReferralValid = additionalData.referral?.toUpperCase() === 'LOTTERY777';
+      const isReferralValid = additionalData.referral?.toUpperCase() === COMMON_REFERRAL_CODE;
       const bonus = isReferralValid ? 50 : 0;
 
       // Save additional user data to Firestore

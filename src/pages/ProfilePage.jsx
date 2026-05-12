@@ -21,8 +21,9 @@ import { useState, useEffect } from 'react';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { sendPasswordResetEmail } from 'firebase/auth';
-import { Edit2, ShieldCheck, Mail, Phone, Key, X, Save } from 'lucide-react';
+import { Edit2, ShieldCheck, Mail, Phone, Key, X, Save, Share2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getReferralLink, COMMON_REFERRAL_CODE } from '../constants/referralConfig';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -170,17 +171,44 @@ const ProfilePage = () => {
                      <div className="flex items-center gap-3 bg-white/5 p-4 rounded-2xl border border-white/10 group-hover:border-[#ff0033]/30 transition-all">
                         <div className="flex-grow overflow-hidden">
                            <p className="text-[8px] font-black text-[#ff0033] uppercase tracking-widest mb-1">Your Referral Link</p>
-                           <p className="text-[10px] font-bold tracking-tight text-gray-400 truncate">{window.location.origin}/signup?ref=LOTTERY777</p>
+                           <p className="text-[10px] font-bold tracking-tight text-gray-400 truncate">{getReferralLink()}</p>
                         </div>
-                        <button 
-                          onClick={() => {
-                            navigator.clipboard.writeText(`${window.location.origin}/signup?ref=LOTTERY777`);
-                            alert('Referral link copied!');
-                          }}
-                          className="bg-[#ff0033] p-3 rounded-xl text-white shadow-lg shadow-[#ff0033]/20 active:scale-95 transition-all shrink-0"
-                        >
-                           <Copy size={18} />
-                        </button>
+                        <div className="flex gap-2">
+                           <button 
+                             onClick={async () => {
+                               const shareData = {
+                                 title: 'Join SMS Lottery',
+                                 text: `Hey! Register on SMS Lottery using code ${COMMON_REFERRAL_CODE} and get ₹50 bonus chips instantly!`,
+                                 url: getReferralLink()
+                               };
+                               
+                               if (navigator.share) {
+                                 try {
+                                   await navigator.share(shareData);
+                                 } catch (err) {
+                                   console.log('Share failed', err);
+                                 }
+                               } else {
+                                 navigator.clipboard.writeText(getReferralLink());
+                                 alert('Referral link copied!');
+                               }
+                             }}
+                             className="bg-[#ff0033] p-3 rounded-xl text-white shadow-lg shadow-[#ff0033]/20 active:scale-95 transition-all shrink-0"
+                             title="Share Link"
+                           >
+                              <Share2 size={18} />
+                           </button>
+                           <button 
+                             onClick={() => {
+                               navigator.clipboard.writeText(getReferralLink());
+                               alert('Referral link copied!');
+                             }}
+                             className="bg-white/10 p-3 rounded-xl text-white border border-white/10 active:scale-95 transition-all shrink-0"
+                             title="Copy Link"
+                           >
+                              <Copy size={18} />
+                           </button>
+                        </div>
                      </div>
                      
                      <div className="mt-4 flex items-center gap-2 p-3 bg-blue-500/10 rounded-xl border border-blue-500/20">
