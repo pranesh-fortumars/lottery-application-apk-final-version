@@ -21,6 +21,11 @@ import {
 import { usePayment } from '../../context/PaymentContext';
 import { subscribeToAppSettings, updateAppSettings } from '../../services/firebaseService';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '../../firebase';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { auth } from '../../firebase';
 
 const SettingRow = ({ label, desc, children }) => (
   <div className="flex flex-col justify-between items-start py-8 gap-4 first:pt-4 last:pb-4 border-b border-gray-50 last:border-none group">
@@ -127,6 +132,108 @@ const GeneralSettingsWithContext = () => {
   );
 };
 
+const MyProfileSettings = () => {
+  const { user } = useAuth();
+  const [localUser, setLocalUser] = useState({
+    name: user?.name || '',
+    mobile: user?.mobile || '',
+    email: user?.email || ''
+  });
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setLocalUser({
+        name: user.name || '',
+        mobile: user.mobile || '',
+        email: user.email || ''
+      });
+    }
+  }, [user]);
+
+  const handleSave = async () => {
+    if (!user?.uid) return;
+    setSaving(true);
+    try {
+      await updateDoc(doc(db, 'users', user.uid), localUser);
+      alert("Your profile has been synchronized successfully!");
+    } catch (error) {
+      console.error("Profile sync error:", error);
+      alert("Failed to sync profile data.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    if (!user?.email) return;
+    if (window.confirm(`A password reset link will be sent to ${user.email}. Continue?`)) {
+       try {
+         await sendPasswordResetEmail(auth, user.email);
+         alert("Secure reset link transmitted to your email.");
+       } catch (err) {
+         alert("Transmission failed: " + err.message);
+       }
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <SettingRow label="Administrative Identity" desc="Your display name as it appears in administrative logs.">
+        <div className="relative">
+          <User className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-200" size={20} />
+          <input 
+            type="text" 
+            value={localUser.name} 
+            onChange={(e) => setLocalUser(prev => ({ ...prev, name: e.target.value }))}
+            className="bg-gray-50/50 border border-gray-100 rounded-2xl pl-16 pr-6 h-16 font-black text-gray-800 outline-none w-full text-xs focus:bg-white focus:border-[#ff004d]/20 transition-all uppercase tracking-widest" 
+          />
+        </div>
+      </SettingRow>
+
+      <SettingRow label="Direct Hotline" desc="Registered mobile number for high-priority alerts.">
+        <div className="relative">
+          <Globe className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-200" size={20} />
+          <input 
+            type="tel" 
+            value={localUser.mobile} 
+            onChange={(e) => setLocalUser(prev => ({ ...prev, mobile: e.target.value }))}
+            className="bg-gray-50/50 border border-gray-100 rounded-2xl pl-16 pr-6 h-16 font-black text-gray-800 outline-none w-full text-xs focus:bg-white focus:border-[#ff004d]/20 transition-all uppercase tracking-widest" 
+          />
+        </div>
+      </SettingRow>
+
+      <SettingRow label="Security Credentials" desc="Manage your access credentials and password security.">
+         <div className="space-y-3">
+            <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100 flex items-center justify-between">
+               <div>
+                  <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-1">Authenticated Email</p>
+                  <p className="text-xs font-black text-gray-800">{user?.email}</p>
+               </div>
+               <Shield className="text-emerald-500" size={20} />
+            </div>
+            <button 
+              onClick={handlePasswordReset}
+              className="w-full h-16 bg-white border-2 border-[#ff004d]/20 text-[#ff004d] rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-[#ff004d] hover:text-white transition-all flex items-center justify-center gap-2"
+            >
+               <Lock size={16} /> Request Secure Reset
+            </button>
+         </div>
+      </SettingRow>
+
+      <div className="pt-6">
+         <button 
+            disabled={saving}
+            onClick={handleSave}
+            className="w-full py-5 bg-gray-900 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl active:scale-95 transition-all disabled:opacity-50"
+          >
+            {saving ? 'SYNCHRONIZING...' : 'Commit Identity Changes'}
+         </button>
+      </div>
+    </div>
+  );
+};
+
 const AdminSettings = () => {
   const [activeTab, setActiveTab] = useState('General');
   const { accounts, activePayment, paymentConfig, setPaymentMode, setManualAccount } = usePayment();
@@ -145,8 +252,9 @@ const AdminSettings = () => {
   };
   const tabs = [
     { id: 'General', icon: Box, label: 'General Info' },
-    { id: 'Security', icon: Key, label: 'Security & Access' },
+    { id: 'Profile', icon: User, label: 'My Identity' },
     { id: 'Financial', icon: CreditCard, label: 'Payment Gateway' },
+    { id: 'Security', icon: Key, label: 'Security & Access' },
     { id: 'Integration', icon: Globe, label: 'API & External' },
   ];
 
@@ -250,6 +358,10 @@ const AdminSettings = () => {
 
             <GeneralSettingsWithContext />
           </div>
+         )}
+
+         {activeTab === 'Profile' && (
+           <MyProfileSettings />
          )}
 
          {activeTab === 'Financial' && (

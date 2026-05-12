@@ -16,10 +16,55 @@ import {
 import { useNavigate } from 'react-router-dom';
 import PageWrapper from '../components/PageWrapper';
 import { useAuth } from '../context/AuthContext';
+import { useState, useEffect } from 'react';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db, auth } from '../firebase';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { Edit2, ShieldCheck, Mail, Phone, Key, X, Save } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editData, setEditData] = useState({ name: '', mobile: '', email: '' });
+  const [updating, setUpdating] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setEditData({
+        name: user.name || '',
+        mobile: user.mobile || '',
+        email: user.email || ''
+      });
+    }
+  }, [user]);
+
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    setUpdating(true);
+    try {
+      await updateDoc(doc(db, 'users', user.uid), editData);
+      alert("Admin profile synchronized!");
+      setShowEditModal(false);
+      window.location.reload(); // Refresh to sync auth context
+    } catch (error) {
+      alert("Update failed: " + error.message);
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (window.confirm("Send password reset link to your email?")) {
+      try {
+        await sendPasswordResetEmail(auth, user.email);
+        alert("Link sent!");
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+  };
 
   const isAdmin = user?.role === 'admin';
   
@@ -54,6 +99,15 @@ const ProfilePage = () => {
                <p className="text-white/60 font-black text-[10px] uppercase tracking-[0.3em] mt-1 shadow-sm px-2 py-0.5 rounded-full border border-white/5 bg-black/5">
                  {isAdmin ? 'Secretariat Authority' : 'Verified Member'}
                </p>
+               
+               {isAdmin && (
+                 <button 
+                   onClick={() => setShowEditModal(true)}
+                   className="mt-6 flex items-center gap-2 bg-white/20 px-6 py-2 rounded-full border border-white/10 backdrop-blur-sm text-white font-black text-[9px] uppercase tracking-widest hover:bg-white/30 transition-all active:scale-95"
+                 >
+                   <Edit2 size={14} /> Customize Identity
+                 </button>
+               )}
             </div>
          </div>
 
@@ -148,6 +202,88 @@ const ProfilePage = () => {
            <p className="text-[9px] text-gray-300 font-bold uppercase tracking-[0.3em] font-serif italic italic leading-tight">Diamond Secretariat Authority Suite v4.5.1</p>
         </div>
       </div>
+
+      {/* Admin Identity Customization Modal */}
+      <AnimatePresence>
+        {showEditModal && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-md z-[2000] flex items-end justify-center p-4 pb-10"
+            onClick={() => setShowEditModal(false)}
+          >
+            <motion.div 
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="bg-white w-full max-w-[480px] rounded-[2.5rem] p-10 shadow-2xl space-y-8 relative overflow-hidden"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex justify-between items-start border-b border-gray-50 pb-8">
+                <div>
+                   <div className="flex items-center gap-3 mb-2">
+                       <ShieldCheck className="text-[#ff0033]" size={24} />
+                       <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tighter italic leading-none">Authority Records</h2>
+                   </div>
+                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Modifying high-privilege credentials</p>
+                </div>
+                <button 
+                  onClick={() => setShowEditModal(false)}
+                  className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-400 active:bg-red-50 active:text-red-500 transition-all border border-gray-100"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+
+              <form onSubmit={handleUpdateProfile} className="space-y-5">
+                {[
+                  { label: 'Display Name', key: 'name', icon: User, type: 'text' },
+                  { label: 'Direct Mobile', key: 'mobile', icon: Phone, type: 'tel' },
+                ].map((field) => (
+                  <div key={field.key} className="space-y-1.5">
+                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">{field.label}</label>
+                    <div className="relative group/field">
+                      <field.icon className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within/field:text-[#ff0033] transition-colors" size={18} />
+                      <input 
+                        required
+                        type={field.type} 
+                        value={editData[field.key]}
+                        onChange={e => setEditData({...editData, [field.key]: e.target.value})}
+                        className="w-full h-15 bg-gray-50/50 border border-gray-100 rounded-2xl pl-16 pr-6 outline-none font-bold text-gray-800 focus:bg-white focus:border-[#ff0033]/20 transition-all text-xs"
+                      />
+                    </div>
+                  </div>
+                ))}
+
+                <div className="pt-4 border-t border-gray-50 space-y-4">
+                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Authentication Security</p>
+                  <button 
+                    type="button"
+                    onClick={handleResetPassword}
+                    className="w-full flex items-center justify-between p-5 bg-blue-50 text-blue-600 rounded-2xl border border-blue-100 active:scale-95 transition-all"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Key size={18} />
+                      <span className="text-[11px] font-black uppercase tracking-widest">Update Secret Password</span>
+                    </div>
+                    <ChevronRight size={16} className="opacity-50" />
+                  </button>
+                </div>
+
+                <button 
+                  type="submit"
+                  disabled={updating}
+                  className="w-full h-16 bg-gray-900 text-white rounded-2xl font-black text-[12px] uppercase tracking-widest shadow-xl shadow-black/20 flex items-center justify-center gap-3 mt-6 active:scale-95 transition-all disabled:opacity-50"
+                >
+                   {updating ? 'SYNCING...' : 'Authorize Changes'} <Save size={18} className="text-[#ff0033]" />
+                </button>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </PageWrapper>
   );
 };
