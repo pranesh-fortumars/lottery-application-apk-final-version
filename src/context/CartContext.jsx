@@ -44,7 +44,9 @@ export const CartProvider = ({ children }) => {
     sessionPersistence: '04 HOURS (STANDARD)',
     keralaSalesClosed: false,
     globalSalesClosed: false,
-    customerCare: '+91 00000 00000'
+    customerCare: '+91 00000 00000',
+    whatsapp: '',
+    telegram: ''
   });
   const [loading, setLoading] = React.useState(true);
 

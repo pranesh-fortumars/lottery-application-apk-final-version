@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import PageWrapper from '../components/PageWrapper';
+import PageWrapper, { SupportSection } from '../components/PageWrapper';
 import { Calendar, RefreshCw, Search, Trophy, Receipt, Download, Printer, ShieldCheck, Clock, Zap } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -275,6 +275,8 @@ const MyTickets = () => {
               <span className="text-[8px] font-black uppercase tracking-widest">Save Ledger</span>
            </button>
         </div>
+
+        <SupportSection />
 
         {/* --- NAVIGATION --- */}
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">

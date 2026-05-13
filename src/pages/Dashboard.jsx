@@ -5,6 +5,7 @@ import { Mail, Diamond, QrCode, Shield } from 'lucide-react';
 import { usePayment } from '../context/PaymentContext';
 import { useCart } from '../context/CartContext';
 import { DRAW_SLOTS } from '../constants/lotteryConfig';
+import { SupportSection } from '../components/PageWrapper';
 
 const CountdownTimer = ({ drawTime }) => {
   const [timeLeft, setTimeLeft] = useState({ h: '00', m: '00', s: '00' });
@@ -250,6 +251,7 @@ const Dashboard = () => {
           </div>
         </>
       )}
+      <SupportSection />
     </div>
   );
 };

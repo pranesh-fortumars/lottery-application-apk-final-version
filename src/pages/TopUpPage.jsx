@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PageWrapper from '../components/PageWrapper';
+import PageWrapper, { SupportSection } from '../components/PageWrapper';
 import { CreditCard, Wallet, ChevronRight, CheckCircle2, QrCode, Landmark, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { usePayment } from '../context/PaymentContext';
@@ -136,6 +136,8 @@ const TopUpPage = () => {
               )}
            </div>
         </div>
+
+        <SupportSection />
 
         <div className="mt-12 text-center opacity-30">
            <p className="text-[9px] font-black text-gray-300 uppercase tracking-[0.4em] italic leading-tight">Secured by SMS Lottery Payments Authority Gateway v2.4</p>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import PageWrapper from '../components/PageWrapper';
+import PageWrapper, { SupportSection } from '../components/PageWrapper';
 import { User, Phone, Users, ChevronRight, Lock, AlertCircle, Mail, Gift } from 'lucide-react';
 import { COMMON_REFERRAL_CODE } from '../constants/referralConfig';
 
@@ -171,9 +171,7 @@ const SignupPage = () => {
           </div>
         </form>
 
-        <div className="mt-auto py-10 opacity-30 text-center">
-           <p className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 italic">India's Largest Prizes Agency</p>
-        </div>
+        <SupportSection />
       </div>
     </PageWrapper>
   );

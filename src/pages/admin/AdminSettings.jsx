@@ -21,7 +21,9 @@ import {
   RotateCcw, 
   AlertTriangle,
   Phone,
-  Mail
+  Mail,
+  MessageCircle,
+  Send
 } from 'lucide-react';
 import { usePayment } from '../../context/PaymentContext';
 import { subscribeToAppSettings, updateAppSettings } from '../../services/firebaseService';
@@ -98,11 +100,37 @@ const GeneralSettingsWithContext = () => {
 
       <SettingRow label="Customer Care Number" desc="Dynamic helpline displayed in Help & Support and on receipts.">
         <div className="relative">
-          <Bell className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-200" size={20} />
+          <Phone className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-200" size={20} />
           <input 
             type="text" 
             value={localSettings.customerCare || ''} 
             onChange={(e) => handleChange('customerCare', e.target.value)}
+            className="bg-gray-50/50 border border-gray-100 rounded-2xl pl-16 pr-6 h-16 font-black text-gray-800 outline-none w-full text-xs focus:bg-white focus:border-[#ff004d]/20 transition-all uppercase tracking-widest" 
+          />
+        </div>
+      </SettingRow>
+
+      <SettingRow label="WhatsApp Support Link" desc="Direct WhatsApp chat URL for instant messaging support.">
+        <div className="relative">
+          <MessageCircle className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-200" size={20} />
+          <input 
+            type="text" 
+            value={localSettings.whatsapp || ''} 
+            onChange={(e) => handleChange('whatsapp', e.target.value)}
+            placeholder="https://wa.me/910000000000"
+            className="bg-gray-50/50 border border-gray-100 rounded-2xl pl-16 pr-6 h-16 font-black text-gray-800 outline-none w-full text-xs focus:bg-white focus:border-[#ff004d]/20 transition-all uppercase tracking-widest" 
+          />
+        </div>
+      </SettingRow>
+
+      <SettingRow label="Telegram Support Link" desc="Official Telegram handle or group link for community support.">
+        <div className="relative">
+          <Send className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-200" size={20} />
+          <input 
+            type="text" 
+            value={localSettings.telegram || ''} 
+            onChange={(e) => handleChange('telegram', e.target.value)}
+            placeholder="https://t.me/yourusername"
             className="bg-gray-50/50 border border-gray-100 rounded-2xl pl-16 pr-6 h-16 font-black text-gray-800 outline-none w-full text-xs focus:bg-white focus:border-[#ff004d]/20 transition-all uppercase tracking-widest" 
           />
         </div>

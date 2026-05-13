@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import PageWrapper from '../components/PageWrapper';
+import PageWrapper, { SupportSection } from '../components/PageWrapper';
 import { LogIn, Lock, UserPlus, HelpCircle, AlertCircle } from 'lucide-react';
 
 const LoginPage = () => {
@@ -110,9 +110,7 @@ const LoginPage = () => {
           </div>
         </form>
 
-        <div className="mt-auto py-10 opacity-30 text-center">
-           <p className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 italic">SMS Lottery Secretariat Portal</p>
-        </div>
+        <SupportSection />
       </div>
     </PageWrapper>
   );

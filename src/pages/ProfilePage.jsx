@@ -15,7 +15,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import PageWrapper from '../components/PageWrapper';
+import PageWrapper, { SupportSection } from '../components/PageWrapper';
 import { useAuth } from '../context/AuthContext';
 import { useState, useEffect } from 'react';
 import { doc, updateDoc } from 'firebase/firestore';
@@ -254,6 +254,8 @@ const ProfilePage = () => {
             <ChevronRight size={20} className="text-white/20" />
           </div>
         </div>
+
+        {!isAdmin && <SupportSection />}
 
         <div className="p-8 text-center border-t border-gray-50 mt-4 opacity-30">
            <p className="text-[9px] text-gray-300 font-bold uppercase tracking-[0.3em] font-serif italic italic leading-tight">SMS Lottery Secretariat Suite v4.5.1</p>

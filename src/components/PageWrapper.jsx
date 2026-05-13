@@ -272,6 +272,83 @@ export const BottomNav = () => {
   );
 };
 
+export const SupportSection = () => {
+  const { appSettings } = useCart();
+  
+  const supportLinks = [
+    { 
+      icon: <img src="https://img.icons8.com/color/48/whatsapp--v1.png" alt="WA" className="w-8 h-8" />, 
+      label: 'WhatsApp', 
+      sub: 'Instant Chat', 
+      color: 'bg-[#E8F5E9]', 
+      link: appSettings.whatsapp 
+    },
+    { 
+      icon: <img src="https://img.icons8.com/color/48/telegram-app.png" alt="TG" className="w-8 h-8" />, 
+      label: 'Telegram', 
+      sub: 'Community', 
+      color: 'bg-[#E3F2FD]', 
+      link: appSettings.telegram 
+    },
+    { 
+      icon: <img src="https://img.icons8.com/color/48/phone.png" alt="PH" className="w-8 h-8" />, 
+      label: 'Helpline', 
+      sub: 'Direct Call', 
+      color: 'bg-red-50', 
+      link: `tel:${appSettings.customerCare}` 
+    },
+  ].filter(item => item.link);
+
+  if (supportLinks.length === 0) return null;
+
+  return (
+    <div className="mt-8 px-6 pb-10">
+      <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm overflow-hidden relative group">
+         <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/5 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+         
+         <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-red-600 shadow-inner">
+               <img src="https://img.icons8.com/color/48/000000/customer-support.png" alt="Support" className="w-8 h-8" />
+            </div>
+            <div>
+               <h3 className="text-xl font-black font-condensed tracking-tighter uppercase italic leading-none">Need Assistance?</h3>
+               <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-1">Our secretariat is here to help 24/7</p>
+            </div>
+         </div>
+
+         <div className="grid grid-cols-1 gap-3">
+            {supportLinks.map((item, idx) => (
+              <a
+                key={idx}
+                href={item.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between p-4 bg-gray-50/50 rounded-2xl border border-gray-100 group active:scale-[0.98] transition-all"
+              >
+                <div className="flex items-center gap-4">
+                  <div className={`w-12 h-12 ${item.color} rounded-xl flex items-center justify-center shadow-sm group-hover:rotate-6 transition-transform`}>
+                    {item.icon}
+                  </div>
+                  <div>
+                    <p className="text-sm font-black text-gray-900 uppercase tracking-tight italic">{item.label}</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{item.sub}</p>
+                  </div>
+                </div>
+                <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-gray-300 group-hover:text-red-500 shadow-sm border border-gray-50 transition-colors">
+                   <ChevronLeft className="rotate-180" size={16} />
+                </div>
+              </a>
+            ))}
+         </div>
+
+         <div className="mt-6 pt-6 border-t border-gray-100 text-center">
+            <p className="text-[8px] font-black text-gray-300 uppercase tracking-[0.2em] italic">Official SMS Lottery Support Network</p>
+         </div>
+      </div>
+    </div>
+  );
+};
+
 const PageWrapper = ({ children, title, showNav = true, showHeader = true, showBack = false, footerAction = null }) => {
   const { appSettings, loading } = useCart();
   const { user } = useAuth();

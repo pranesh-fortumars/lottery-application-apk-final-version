@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PageWrapper from '../components/PageWrapper';
+import PageWrapper, { SupportSection } from '../components/PageWrapper';
 import { Wallet, ShieldCheck, ArrowUpRight, CheckCircle2, XCircle, AlertTriangle, Zap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../firebase';
@@ -147,6 +147,8 @@ const WithdrawPage = () => {
              {isProcessing ? 'PROCESSING...' : 'Authorize Withdrawal'} <ArrowUpRight size={18} />
            </button>
         </form>
+
+        <SupportSection />
 
         <div className="mt-12 text-center opacity-30">
            <p className="text-[9px] font-black text-gray-300 uppercase tracking-[0.4em] italic leading-tight">Secured Financial Authority Protocol v2.1</p>

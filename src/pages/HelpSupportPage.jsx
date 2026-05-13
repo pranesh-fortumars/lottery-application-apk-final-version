@@ -9,10 +9,31 @@ const HelpSupportPage = () => {
   const { appSettings } = useCart();
 
   const supportOptions = [
-    { icon: <MessageCircle size={20} />, label: 'Live Chat', desc: 'Usually replies in 5 minutes', action: () => alert('Live chat agent is currently unavailable. Please try again during business hours.') },
-    { icon: <Mail size={20} />, label: 'Email Support', desc: 'support@smslottery.com', action: () => window.location.href = 'mailto:support@smslottery.com' },
-    { icon: <FileText size={20} />, label: 'FAQs', desc: 'Frequently asked questions', action: () => alert('FAQs are currently being updated.') },
-  ];
+    appSettings.whatsapp && { 
+      icon: <img src="https://img.icons8.com/color/48/whatsapp--v1.png" alt="WA" className="w-6 h-6" />, 
+      label: 'WhatsApp', 
+      desc: 'Direct Messaging Support', 
+      action: () => window.open(appSettings.whatsapp, '_blank') 
+    },
+    appSettings.telegram && { 
+      icon: <img src="https://img.icons8.com/color/48/telegram-app.png" alt="TG" className="w-6 h-6" />, 
+      label: 'Telegram', 
+      desc: 'Official Support Group', 
+      action: () => window.open(appSettings.telegram, '_blank') 
+    },
+    { 
+      icon: <Mail size={20} />, 
+      label: 'Email Support', 
+      desc: 'support@smslottery.com', 
+      action: () => window.location.href = 'mailto:support@smslottery.com' 
+    },
+    { 
+      icon: <FileText size={20} />, 
+      label: 'FAQs', 
+      desc: 'Frequently asked questions', 
+      action: () => alert('FAQs are currently being updated.') 
+    },
+  ].filter(Boolean);
 
   return (
     <PageWrapper title="HELP & SUPPORT" showNav={false}>
