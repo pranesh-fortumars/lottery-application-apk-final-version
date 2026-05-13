@@ -338,7 +338,7 @@ export const CartProvider = ({ children }) => {
   const removeFromCart = (id) => setCart((prev) => prev.filter((item) => item.id !== id));
   const clearCart = () => setCart([]);
 
-  const confirmPurchase = async (isPrepaid = false, transactionId = null, userUpiId = null) => {
+  const confirmPurchase = async (isPrepaid = false, transactionId = null, userUpiId = null, paymentType = 'UPI', bonusUsed = 0) => {
     if (cart.length === 0 || !user) return;
     
     const totalCost = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
@@ -380,13 +380,25 @@ export const CartProvider = ({ children }) => {
           userMobile: user.mobile || 'No Mobile',
           userUpiId: userUpiId,
           type: 'purchase',
+          paymentType: paymentType,
           amount: totalCost,
-          transactionId: transactionId,
+          bonusUsed: bonusUsed,
+          amountPaid: totalCost - bonusUsed,
+          transactionId: transactionId || (paymentType === 'Referral Bonus' ? `REF-${txId}` : null),
           status: 'pending',
           cartItems: cart,
           purchaseId: txId,
           timestamp: serverTimestamp()
         });
+
+        // For Referral Bonus or mixed payments, we deduct the bonus immediately
+        if (bonusUsed > 0) {
+          const userRef = doc(db, 'users', user.uid);
+          batch.update(userRef, { 
+            bonusBalance: increment(-bonusUsed),
+            balance: increment(-bonusUsed)
+          });
+        }
       } else {
         // Direct purchase using wallet
         cart.forEach(item => {

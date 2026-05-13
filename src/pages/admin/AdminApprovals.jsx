@@ -69,7 +69,7 @@ const AdminApprovals = () => {
             purchaseDate: purchaseDate,
             purchaseTime: purchaseTime,
             status: 'Active',
-            paidVia: 'UPI',
+            paidVia: tx.paymentType || 'UPI',
             prize: '-',
             timestamp: serverTimestamp()
           });
@@ -96,12 +96,21 @@ const AdminApprovals = () => {
         rejectedAt: serverTimestamp()
       });
 
+      // For Referral Bonus, we MUST refund the balance on rejection
+      if (tx.type === 'purchase' && tx.paymentType === 'Referral Bonus') {
+        const userRef = doc(db, 'users', tx.userId);
+        batch.update(userRef, { 
+          bonusBalance: increment(tx.amount),
+          balance: increment(tx.amount)
+        });
+      }
+
       // Create Notification for User
       const notifRef = doc(collection(db, 'notifications'));
       batch.set(notifRef, {
         userId: tx.userId,
         title: 'Payment Rejected',
-        message: `Your ${tx.type} of ₹${tx.amount} was rejected. Please contact support if you believe this is an error.`,
+        message: `Your ${tx.type} of ₹${tx.amount} was rejected. ${tx.paymentType === 'Referral Bonus' ? 'Your bonus balance has been refunded.' : 'Please contact support if you believe this is an error.'}`,
         type: 'error',
         read: false,
         timestamp: serverTimestamp()
@@ -138,6 +147,9 @@ const AdminApprovals = () => {
                     <div className="flex items-center gap-2">
                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Type: </span>
                        <span className={`text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-tighter ${tx.type === 'topup' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>{tx.type}</span>
+                       {tx.paymentType && (
+                         <span className={`text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-tighter ${tx.paymentType === 'Referral Bonus' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600'}`}>{tx.paymentType === 'Referral Bonus' ? 'Ref' : tx.paymentType}</span>
+                       )}
                     </div>
                     <p className="text-lg font-black text-gray-900 leading-none mt-2">{tx.userName}</p>
                     <div className="flex items-center gap-2 mt-1">

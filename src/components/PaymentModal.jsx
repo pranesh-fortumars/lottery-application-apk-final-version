@@ -59,117 +59,83 @@ const PaymentModal = ({ isOpen, onClose, amount, onConfirm }) => {
 
           <div className="p-8 space-y-6">
             {/* QR Code */}
-            <div className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
-               <div className="relative p-2 bg-white rounded-2xl shadow-lg mb-4">
-                  <img src={activePayment.qrUrl} alt="UPI QR Code" className="w-48 h-48" />
-                  <div className="absolute inset-0 border-4 border-gray-50/50 rounded-2xl pointer-events-none"></div>
+            <div className="flex flex-col items-center justify-center p-6 bg-gray-50 rounded-[2rem] border-2 border-dashed border-gray-200">
+               <div className="relative p-3 bg-white rounded-2xl shadow-xl mb-4 transform hover:scale-105 transition-transform duration-500">
+                  <img src={activePayment.qrUrl} alt="UPI QR Code" className="w-52 h-52" />
+                  <div className="absolute inset-0 border-4 border-gray-50/30 rounded-2xl pointer-events-none"></div>
                </div>
-               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Scan QR with any UPI App</p>
-            </div>
-
-            {/* UPI ID */}
-            <div className="space-y-3">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Transfer to UPI ID</label>
-              <div className="flex gap-2">
-                <div className="flex-grow bg-gray-50 border border-gray-100 rounded-2xl px-4 py-3 flex items-center justify-between group">
-                  <span className="font-black text-gray-800 text-sm truncate">{activePayment.upiId}</span>
-                  <button 
-                    onClick={handleCopy}
-                    className="p-2 hover:bg-white rounded-xl transition-colors text-[#ff0033]"
-                  >
-                    {copied ? <CheckCircle2 size={18} /> : <Copy size={18} />}
-                  </button>
-                </div>
-              </div>
-              <p className="text-[9px] text-[#ff0033] font-black uppercase italic">{activePayment.bankName}</p>
-            </div>
-
-            {/* Summary */}
-            <div className="bg-emerald-50 p-4 rounded-2xl flex items-start gap-3 border border-emerald-100">
-               <ShieldCheck className="text-emerald-500 shrink-0" size={20} />
-               <p className="text-[10px] text-emerald-800 font-bold leading-relaxed">
-                  After payment, click "I HAVE PAID" below to confirm. Our admin will verify your transaction manually.
+               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest text-center px-4 leading-relaxed">
+                  1. Scan QR with any UPI App<br/>
+                  2. Make payment of ₹{amount}
                </p>
             </div>
 
-            {/* Actions */}
-            <div className="grid grid-cols-1 gap-3">
-              {!showInput ? (
-                <>
+            {/* UPI ID */}
+            <div className="space-y-3 bg-red-50/50 p-4 rounded-2xl border border-red-100">
+               <label className="text-[9px] font-black text-[#ff0033] uppercase tracking-widest ml-1">Manual Transfer Details</label>
+               <div className="flex items-center justify-between bg-white px-4 py-3 rounded-xl border border-red-100">
+                  <span className="font-black text-gray-800 text-xs truncate select-all">{activePayment.upiId}</span>
                   <button 
-                    onClick={() => {
-                      setHasStarted(true);
-                      setShowInput(true);
-                      window.location.href = `upi://pay?pa=${activePayment.upiId}&pn=Admin&am=${amount}&cu=INR`;
-                    }}
-                    className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 active:scale-95 transition-all text-center flex items-center justify-center gap-2"
+                    onClick={handleCopy}
+                    className="p-1.5 hover:bg-red-50 rounded-lg transition-colors text-[#ff0033]"
                   >
-                    Open UPI App
+                    {copied ? <CheckCircle2 size={16} /> : <Copy size={16} />}
                   </button>
-                  <button 
-                    onClick={() => {
-                      setHasStarted(true);
-                      setShowInput(true);
-                    }}
-                    className="w-full bg-[#ff0033] text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-red-500/20 active:scale-95 transition-all"
-                  >
-                    I Have Paid
-                  </button>
-                  <button 
-                    onClick={onClose}
-                    className="w-full bg-gray-100 text-gray-400 py-4 rounded-2xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all"
-                  >
-                    Cancel
-                  </button>
-                </>
-              ) : (
-                <div className="space-y-4">
-                  <div className="space-y-3">
-                    <div>
-                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Your UPI ID (From which you paid)</label>
-                      <input 
-                        type="text" 
-                        value={userUpiId}
-                        onChange={(e) => setUserUpiId(e.target.value)}
-                        placeholder="e.g. user@okaxis"
-                        className="w-full mt-1 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-[#ff0033] focus:ring-1 focus:ring-[#ff0033]"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Enter Transaction ID / UTR</label>
-                      <input 
-                        type="text" 
-                        value={transactionId}
-                        onChange={(e) => setTransactionId(e.target.value)}
-                        placeholder="e.g. 123456789012"
-                        className="w-full mt-1 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-[#ff0033] focus:ring-1 focus:ring-[#ff0033]"
-                      />
-                    </div>
+               </div>
+               <p className="text-[9px] text-gray-400 font-bold uppercase italic text-center">Beneficiary: {activePayment.bankName}</p>
+            </div>
+
+            {/* Input Fields */}
+            <div className="space-y-4 pt-2">
+               <div className="space-y-3">
+                  <div>
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Your Paying UPI ID</label>
+                    <input 
+                      type="text" 
+                      value={userUpiId}
+                      onChange={(e) => setUserUpiId(e.target.value)}
+                      placeholder="e.g. yourname@okaxis"
+                      className="w-full mt-1 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-4 text-sm font-bold focus:outline-none focus:border-[#ff0033] focus:ring-4 focus:ring-[#ff0033]/5 transition-all"
+                    />
                   </div>
-                  <button 
-                    onClick={() => {
-                      if (!userUpiId.trim()) return alert("Please enter your UPI ID");
-                      if (!transactionId.trim()) return alert("Please enter Transaction ID");
-                      onConfirm(transactionId, userUpiId);
-                      setShowInput(false);
-                      setHasStarted(false); // Reset for next use
-                      setTransactionId('');
-                      setUserUpiId('');
-                    }}
-                    className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 active:scale-95 transition-all"
-                  >
-                    Submit Transaction
-                  </button>
-                  {!hasStarted && (
-                    <button 
-                      onClick={() => setShowInput(false)}
-                      className="w-full bg-gray-100 text-gray-400 py-4 rounded-2xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all"
-                    >
-                      Back
-                    </button>
-                  )}
-                </div>
-              )}
+                  <div>
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Transaction ID / UTR (12 Digits)</label>
+                    <input 
+                      type="text" 
+                      value={transactionId}
+                      onChange={(e) => setTransactionId(e.target.value)}
+                      placeholder="Enter 12-digit UTR number"
+                      className="w-full mt-1 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-4 text-sm font-bold focus:outline-none focus:border-[#ff0033] focus:ring-4 focus:ring-[#ff0033]/5 transition-all"
+                    />
+                  </div>
+               </div>
+
+               <div className="bg-emerald-50 p-4 rounded-2xl flex items-start gap-3 border border-emerald-100">
+                  <ShieldCheck className="text-emerald-500 shrink-0" size={20} />
+                  <p className="text-[10px] text-emerald-800 font-bold leading-relaxed">
+                     Double check your Transaction ID. Incorrect details will result in rejection.
+                  </p>
+               </div>
+
+               <button 
+                  onClick={() => {
+                    if (!userUpiId.trim()) return alert("Please enter your UPI ID");
+                    if (!transactionId.trim()) return alert("Please enter Transaction ID");
+                    onConfirm(transactionId, userUpiId);
+                    setTransactionId('');
+                    setUserUpiId('');
+                  }}
+                  className="w-full bg-[#ff0033] text-white py-5 rounded-[1.5rem] font-black text-xs uppercase tracking-widest shadow-xl shadow-red-500/20 active:scale-95 transition-all flex items-center justify-center gap-2"
+               >
+                  I Have Paid
+               </button>
+
+               <button 
+                  onClick={onClose}
+                  className="w-full bg-gray-100 text-gray-400 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest active:scale-95 transition-all"
+               >
+                  Go Back
+               </button>
             </div>
           </div>
         </motion.div>

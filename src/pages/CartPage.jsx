@@ -17,10 +17,31 @@ const CartPage = () => {
 
   const hasKeralaItems = cart.some(item => (item.title || "").toUpperCase().includes('KERALA'));
   const keralaOverrideActive = hasKeralaItems && appSettings?.keralaSalesClosed;
+  
+  const bonusAvailable = user?.bonusBalance || 0;
+  const bonusUsed = Math.min(cartTotal, bonusAvailable);
+  const remainingToPay = cartTotal - bonusUsed;
+  const isFullBonus = remainingToPay === 0;
 
-  const handlePay = () => {
+  const handlePay = async () => {
     if (cart.length === 0 || keralaOverrideActive) return;
-    setShowPayment(true);
+    
+    if (isFullBonus) {
+      if (window.confirm(`Use ₹${bonusUsed} from your Referral Bonus to purchase these tickets? This will be submitted for admin approval.`)) {
+        setIsProcessing(true);
+        try {
+          await confirmPurchase(true, null, null, 'Referral Bonus', bonusUsed);
+          alert("Request Submitted! Your tickets will be confirmed after admin verification.");
+          navigate('/home');
+        } catch (error) {
+          alert("Failed to submit request.");
+        } finally {
+          setIsProcessing(false);
+        }
+      }
+    } else {
+      setShowPayment(true);
+    }
   };
 
   const handlePaymentConfirm = async (transactionId, userUpiId) => {
@@ -28,7 +49,7 @@ const CartPage = () => {
     setIsProcessing(true);
     
     try {
-      await confirmPurchase(true, transactionId, userUpiId); 
+      await confirmPurchase(true, transactionId, userUpiId, 'UPI', bonusUsed); 
       navigate('/home'); 
     } catch (error) {
       console.error("Purchase error:", error);
@@ -48,7 +69,7 @@ const CartPage = () => {
         disabled={isProcessing || cart.length === 0 || keralaOverrideActive}
         className={`flex-1 text-white py-4 rounded-2xl flex items-center justify-center gap-2 font-black text-sm shadow-[0_15px_30px_-5px_rgba(255,0,85,0.4)] active:scale-95 transition-all disabled:opacity-50 border-b-4 border-black/10 ${keralaOverrideActive ? 'bg-gray-400' : 'bg-[#ff0033]'}`}
       >
-        <ShoppingCart size={20} fill="white" /> {isProcessing ? 'Waiting...' : (keralaOverrideActive ? 'Sales Closed' : 'Confirm Pay')}
+        <ShoppingCart size={20} fill="white" /> {isProcessing ? 'Waiting...' : (keralaOverrideActive ? 'Sales Closed' : (isFullBonus ? 'Pay with Bonus' : 'Confirm Pay'))}
       </button>
       
       <button 
@@ -167,7 +188,7 @@ const CartPage = () => {
       <PaymentModal 
         isOpen={showPayment} 
         onClose={() => setShowPayment(false)} 
-        amount={cartTotal.toFixed(2)}
+        amount={remainingToPay.toFixed(2)}
         onConfirm={handlePaymentConfirm}
       />
     </PageWrapper>
