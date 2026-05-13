@@ -109,7 +109,7 @@ export const AuthProvider = ({ children }) => {
       return { success: true };
     } catch (error) {
       // Special Auto-Provisioning for Default Mock Accounts
-      const isDefaultAdmin = email === 'admin@lottery.com' && password === 'admin123';
+      const isDefaultAdmin = email === 'smswinsms@gmail.com' && password === 'admin123';
       const isDefaultUser = email === 'user@lottery.com' && password === 'user123';
 
       if (isDefaultAdmin || isDefaultUser) {

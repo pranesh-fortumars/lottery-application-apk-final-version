@@ -27,8 +27,8 @@ const HelpSupportPage = () => {
     { 
       icon: <Mail size={20} />, 
       label: 'Email Support', 
-      desc: 'support@smslottery.com', 
-      action: () => window.location.href = 'mailto:support@smslottery.com' 
+      desc: 'smswinsms@gmail.com', 
+      action: () => window.location.href = 'mailto:smswinsms@gmail.com' 
     },
     { 
       icon: <FileText size={20} />, 

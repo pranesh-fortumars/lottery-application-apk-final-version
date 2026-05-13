@@ -22,7 +22,7 @@ const LoginPage = () => {
     // Exact mapping for mock default accounts to match legacy behavior
     const idLower = identifier.toLowerCase();
     if (idLower === 'admin') {
-      loginEmail = 'admin@lottery.com';
+      loginEmail = 'smswinsms@gmail.com';
     } else if (idLower === 'user') {
       loginEmail = 'user@lottery.com';
     } else if (/^\d{10}$/.test(identifier)) {
