@@ -77,7 +77,7 @@ const JackpotPage = () => {
 
   return (
     <PageWrapper 
-      title="DIAMOND JACKPOT LOTTERY" 
+      title="SMS LOTTERY JACKPOT" 
       showNav={true}
       showBack={true}
       footerAction={jackpotFooter}

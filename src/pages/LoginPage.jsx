@@ -111,7 +111,7 @@ const LoginPage = () => {
         </form>
 
         <div className="mt-auto py-10 opacity-30 text-center">
-           <p className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 italic">Diamond Secretariat Portal</p>
+           <p className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 italic">SMS Lottery Secretariat Portal</p>
         </div>
       </div>
     </PageWrapper>

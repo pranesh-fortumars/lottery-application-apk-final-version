@@ -10,7 +10,7 @@ const HelpSupportPage = () => {
 
   const supportOptions = [
     { icon: <MessageCircle size={20} />, label: 'Live Chat', desc: 'Usually replies in 5 minutes', action: () => alert('Live chat agent is currently unavailable. Please try again during business hours.') },
-    { icon: <Mail size={20} />, label: 'Email Support', desc: 'support@diamondsecretariat.com', action: () => window.location.href = 'mailto:support@diamondsecretariat.com' },
+    { icon: <Mail size={20} />, label: 'Email Support', desc: 'support@smslottery.com', action: () => window.location.href = 'mailto:support@smslottery.com' },
     { icon: <FileText size={20} />, label: 'FAQs', desc: 'Frequently asked questions', action: () => alert('FAQs are currently being updated.') },
   ];
 

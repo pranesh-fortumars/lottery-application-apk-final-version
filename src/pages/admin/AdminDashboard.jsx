@@ -74,7 +74,7 @@ const AdminDashboard = () => {
             <img src="https://img.icons8.com/color/64/000000/treasure-chest.png" alt="Chest" className="w-16 h-16 drop-shadow-xl" />
             <div className="flex-grow">
                <h2 className="text-2xl font-black text-gray-900 font-condensed uppercase tracking-tighter italic">Command Center</h2>
-               <p className="text-[#ff004d] font-black text-[10px] uppercase tracking-widest leading-none mt-1">Diamond Agency Oversight v4.1</p>
+               <p className="text-[#ff004d] font-black text-[10px] uppercase tracking-widest leading-none mt-1">SMS Lottery Oversight v4.1</p>
             </div>
          </div>
          

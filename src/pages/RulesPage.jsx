@@ -29,7 +29,7 @@ const RulesPage = () => {
   );
 
   return (
-    <PageWrapper title="DIAMOND RULES" showNav={true} showHeader={false}>
+    <PageWrapper title="SMS LOTTERY RULES" showNav={true} showHeader={false}>
       {/* Custom Header to match image exactly */}
       <div className="bg-[#f42464] h-[60px] flex items-center justify-between px-4 text-white shrink-0">
         <div className="flex items-center gap-2">
@@ -38,7 +38,7 @@ const RulesPage = () => {
               <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
             </svg>
           </button>
-          <h1 className="text-xl font-condensed font-black tracking-tighter uppercase italic">DIAMOND RULES</h1>
+          <h1 className="text-xl font-condensed font-black tracking-tighter uppercase italic">SMS LOTTERY RULES</h1>
         </div>
         <button onClick={() => navigate('/profile')}>
           <div className="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center">
@@ -49,7 +49,7 @@ const RulesPage = () => {
 
       <div className="bg-white min-h-screen px-6 py-8 pb-32 overflow-y-auto">
         <div className="max-w-[400px] mx-auto text-center mb-8">
-          <h2 className="text-gray-900 font-black text-lg font-sans uppercase tracking-tight">Diamond Agency</h2>
+          <h2 className="text-gray-900 font-black text-lg font-sans uppercase tracking-tight">SMS Lottery</h2>
         </div>
 
         <div className="space-y-6">

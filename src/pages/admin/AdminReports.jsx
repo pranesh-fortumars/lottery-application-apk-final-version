@@ -28,7 +28,7 @@ const AdminReports = () => {
             <img src="https://img.icons8.com/color/64/000000/treasure-chest.png" alt="Chest" className="w-16 h-16 drop-shadow-xl group-hover:scale-110 transition-transform" />
             <div className="flex-grow">
                <h2 className="text-2xl font-black text-gray-900 font-condensed uppercase tracking-tighter italic leading-none">Intelligence</h2>
-               <p className="text-[#ff004d] font-black text-[10px] uppercase tracking-widest leading-none mt-1">Diamond Agency Insights</p>
+               <p className="text-[#ff004d] font-black text-[10px] uppercase tracking-widest leading-none mt-1">SMS Lottery Insights</p>
             </div>
             <button className="bg-gray-50 border border-gray-100 p-3 rounded-2xl text-gray-400 hover:text-[#f42464] hover:bg-[#fce4ec] transition-all">
                <Download size={20} />

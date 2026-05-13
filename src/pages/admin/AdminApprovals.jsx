@@ -160,6 +160,11 @@ const AdminApprovals = () => {
                  </div>
                  <div className="text-right">
                     <p className="text-2xl font-black text-[#ff0033] tracking-tighter italic">₹{tx.amount}</p>
+                    {tx.userEnteredAmount !== undefined && tx.userEnteredAmount !== null && (
+                       <p className="text-[9px] font-black text-emerald-600 uppercase tracking-widest mt-1">
+                          User Paid: ₹{tx.userEnteredAmount}
+                       </p>
+                    )}
                  </div>
               </div>
 

@@ -338,7 +338,7 @@ export const CartProvider = ({ children }) => {
   const removeFromCart = (id) => setCart((prev) => prev.filter((item) => item.id !== id));
   const clearCart = () => setCart([]);
 
-  const confirmPurchase = async (isPrepaid = false, transactionId = null, userUpiId = null, paymentType = 'UPI', bonusUsed = 0) => {
+  const confirmPurchase = async (isPrepaid = false, transactionId = null, userUpiId = null, paymentType = 'UPI', bonusUsed = 0, userEnteredAmount = null) => {
     if (cart.length === 0 || !user) return;
     
     const totalCost = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
@@ -384,6 +384,7 @@ export const CartProvider = ({ children }) => {
           amount: totalCost,
           bonusUsed: bonusUsed,
           amountPaid: totalCost - bonusUsed,
+          userEnteredAmount: userEnteredAmount ? parseFloat(userEnteredAmount) : (paymentType === 'Referral Bonus' ? 0 : null),
           transactionId: transactionId || (paymentType === 'Referral Bonus' ? `REF-${txId}` : null),
           status: 'pending',
           cartItems: cart,

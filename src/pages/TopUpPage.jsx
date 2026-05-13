@@ -18,7 +18,7 @@ const TopUpPage = () => {
 
   const amounts = ['100.00', '200.00', '500.00', '1000.00', '2000.00', '5000.00'];
 
-  const handleTopup = async (transactionId, userUpiId) => {
+  const handleTopup = async (transactionId, userUpiId, paidAmount) => {
     if (!user) return;
     
     setShowPayment(false); 
@@ -32,6 +32,7 @@ const TopUpPage = () => {
         userName: user.name || 'Unknown',
         userMobile: user.mobile || 'No Mobile',
         userUpiId: userUpiId,
+        userEnteredAmount: parseFloat(paidAmount) || 0,
         type: 'topup',
         amount: topupVal,
         transactionId: transactionId,
@@ -137,7 +138,7 @@ const TopUpPage = () => {
         </div>
 
         <div className="mt-12 text-center opacity-30">
-           <p className="text-[9px] font-black text-gray-300 uppercase tracking-[0.4em] italic leading-tight">Secured by Diamond Agency Payments Authority Gateway v2.4</p>
+           <p className="text-[9px] font-black text-gray-300 uppercase tracking-[0.4em] italic leading-tight">Secured by SMS Lottery Payments Authority Gateway v2.4</p>
         </div>
       </div>
 
@@ -152,4 +153,3 @@ const TopUpPage = () => {
 };
 
 export default TopUpPage;
-

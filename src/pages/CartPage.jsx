@@ -44,12 +44,12 @@ const CartPage = () => {
     }
   };
 
-  const handlePaymentConfirm = async (transactionId, userUpiId) => {
+  const handlePaymentConfirm = async (transactionId, userUpiId, paidAmount) => {
     setShowPayment(false);
     setIsProcessing(true);
     
     try {
-      await confirmPurchase(true, transactionId, userUpiId, 'UPI', bonusUsed); 
+      await confirmPurchase(true, transactionId, userUpiId, 'UPI', bonusUsed, paidAmount); 
       navigate('/home'); 
     } catch (error) {
       console.error("Purchase error:", error);

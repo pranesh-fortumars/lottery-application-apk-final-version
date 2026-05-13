@@ -49,7 +49,7 @@ const FullPageLoader = () => (
      </div>
      <div className="mt-8 text-center">
         <h2 className="text-xl font-black italic uppercase tracking-[0.2em] text-gray-900">Authenticating</h2>
-        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mt-2 italic">Securing Diamond Secretariat Connection...</p>
+        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mt-2 italic">Securing SMS Lottery Connection...</p>
      </div>
   </div>
 );

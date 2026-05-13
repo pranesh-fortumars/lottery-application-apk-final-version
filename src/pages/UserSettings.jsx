@@ -8,53 +8,57 @@ const UserSettings = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const settingsOptions = [
+  const settingsGroups = [
     { icon: <User size={20} />, label: 'Personal Information', desc: 'Update your profile details', onClick: () => navigate('/settings/personal-info') },
     { icon: <Lock size={20} />, label: 'Change Password', desc: 'Secure your account', onClick: () => navigate('/reset-password') },
     { icon: <Bell size={20} />, label: 'Notifications', desc: 'Manage push & email alerts', onClick: () => navigate('/settings/notifications') },
     { icon: <Shield size={20} />, label: 'Privacy & Security', desc: 'Two-factor auth & devices', onClick: () => navigate('/settings/privacy') },
-    { icon: <HelpCircle size={20} />, label: 'Help & Support', desc: 'Contact Diamond Secretariat', onClick: () => navigate('/settings/help') }
+    { icon: <HelpCircle size={20} />, label: 'Help & Support', desc: 'Contact SMS Lottery Secretariat', onClick: () => navigate('/settings/help') }
   ];
 
   return (
-    <PageWrapper title="ACCOUNT SETTINGS" showNav={true} showBack={true}>
-      <div className="bg-[#f8f9fa] min-h-screen p-4 pb-24">
-        
-        {/* Header Graphic */}
-        <div className="bg-gradient-to-br from-gray-900 to-black rounded-[2.5rem] p-8 text-white shadow-2xl relative overflow-hidden mb-6 group">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl group-hover:bg-[#ff0033]/20 transition-colors"></div>
-          <div className="relative z-10">
-            <h2 className="text-2xl font-black font-condensed tracking-tighter uppercase italic leading-none">Security Configuration</h2>
-            <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] mt-2">Manage preferences for {user?.name || 'your account'}</p>
-          </div>
+    <PageWrapper title="SETTINGS" showBack={true}>
+      <div className="bg-white min-h-screen p-4 flex flex-col items-center">
+        {/* Profile Card Summary */}
+        <div className="w-full max-w-sm bg-gray-50 rounded-[2.5rem] p-6 mb-8 border border-gray-100 shadow-inner flex items-center gap-4">
+           <div className="w-16 h-16 bg-[#ff0033] rounded-2xl flex items-center justify-center text-white text-2xl font-black italic shadow-lg">
+              {user?.name?.charAt(0).toUpperCase() || 'U'}
+           </div>
+           <div>
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Authenticated Account</p>
+              <p className="text-sm font-black text-gray-900 truncate">{user?.name || 'Authorized User'}</p>
+           </div>
         </div>
 
-        {/* Options List */}
-        <div className="space-y-4">
-          <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-4 mb-2 italic">General Preferences</p>
-          
-          {settingsOptions.map((opt, idx) => (
-            <div 
-              key={idx} 
-              onClick={opt.onClick}
-              className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 flex items-center justify-between group active:scale-95 transition-all cursor-pointer hover:border-gray-200"
+        {/* Settings Groups */}
+        <div className="w-full max-w-sm space-y-3">
+          {settingsGroups.map((group, idx) => (
+            <button 
+              key={idx}
+              onClick={group.onClick}
+              className="w-full bg-white border border-gray-100 p-5 rounded-[1.5rem] flex items-center gap-4 hover:bg-gray-50 active:scale-95 transition-all group shadow-sm"
             >
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-500 group-hover:bg-[#ff0033]/10 group-hover:text-[#ff0033] transition-colors border border-gray-100">
-                  {opt.icon}
-                </div>
-                <div>
-                  <h3 className="text-sm font-black text-gray-800 uppercase tracking-tight italic">{opt.label}</h3>
-                  <p className="text-[10px] font-medium text-gray-400 mt-0.5">{opt.desc}</p>
-                </div>
+              <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 group-hover:text-[#ff0033] group-hover:bg-red-50 transition-colors shadow-inner">
+                 {group.icon}
               </div>
-              <ChevronRight size={20} className="text-gray-300 group-hover:text-[#ff0033] transition-colors" />
-            </div>
+              <div className="text-left flex-1 min-w-0">
+                 <p className="text-xs font-black text-gray-900 uppercase tracking-tight">{group.label}</p>
+                 <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest truncate">{group.desc}</p>
+              </div>
+              <ChevronRight size={16} className="text-gray-300 group-hover:text-[#ff0033] transition-colors" />
+            </button>
           ))}
         </div>
 
-        <div className="mt-12 text-center opacity-30">
-           <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.3em] italic">Diamond Security Protocol v2.1</p>
+        <button 
+          onClick={logout}
+          className="w-full max-w-sm mt-12 h-14 bg-gray-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2 hover:bg-[#ff0033] mb-10"
+        >
+          Terminate Session
+        </button>
+
+        <div className="mt-auto mb-10 text-center opacity-30">
+           <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.3em] italic">SMS Lottery Security Protocol v2.1</p>
         </div>
       </div>
     </PageWrapper>

@@ -218,7 +218,7 @@ const AdminUserDetails = () => {
             </div>
             <div className="flex-grow">
                <h2 className="text-2xl font-black text-gray-900 font-condensed uppercase tracking-tighter italic leading-none">{user.name || 'Anonymous'}</h2>
-               <p className="text-[#ff004d] font-black text-[10px] uppercase tracking-widest leading-none mt-1">Player Rank: Diamond Elite</p>
+               <p className="text-[#ff004d] font-black text-[10px] uppercase tracking-widest leading-none mt-1">Player Rank: Lottery Elite</p>
                <div className="mt-3 flex gap-2">
                  <span className="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest border border-emerald-100 flex items-center gap-1">
                     <Zap size={10} fill="currentColor" /> {user.status || 'Active'}

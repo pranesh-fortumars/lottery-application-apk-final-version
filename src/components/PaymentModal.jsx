@@ -10,6 +10,7 @@ const PaymentModal = ({ isOpen, onClose, amount, onConfirm }) => {
   const [hasStarted, setHasStarted] = React.useState(false);
   const [transactionId, setTransactionId] = React.useState('');
   const [userUpiId, setUserUpiId] = React.useState('');
+  const [paidAmount, setPaidAmount] = React.useState('');
 
   const handleCopy = () => {
     if (activePayment?.upiId) {
@@ -89,6 +90,16 @@ const PaymentModal = ({ isOpen, onClose, amount, onConfirm }) => {
             <div className="space-y-4 pt-2">
                <div className="space-y-3">
                   <div>
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Amount Actually Paid (₹)</label>
+                    <input 
+                      type="number" 
+                      value={paidAmount}
+                      onChange={(e) => setPaidAmount(e.target.value)}
+                      placeholder={`Enter exact amount paid`}
+                      className="w-full mt-1 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-4 text-sm font-bold focus:outline-none focus:border-[#ff0033] focus:ring-4 focus:ring-[#ff0033]/5 transition-all"
+                    />
+                  </div>
+                  <div>
                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Your Paying UPI ID</label>
                     <input 
                       type="text" 
@@ -113,17 +124,19 @@ const PaymentModal = ({ isOpen, onClose, amount, onConfirm }) => {
                <div className="bg-emerald-50 p-4 rounded-2xl flex items-start gap-3 border border-emerald-100">
                   <ShieldCheck className="text-emerald-500 shrink-0" size={20} />
                   <p className="text-[10px] text-emerald-800 font-bold leading-relaxed">
-                     Double check your Transaction ID. Incorrect details will result in rejection.
+                     Double check your Transaction ID and Amount. Incorrect details will result in rejection.
                   </p>
                </div>
 
                <button 
                   onClick={() => {
+                    if (!paidAmount || parseFloat(paidAmount) <= 0) return alert("Please enter the amount you paid");
                     if (!userUpiId.trim()) return alert("Please enter your UPI ID");
                     if (!transactionId.trim()) return alert("Please enter Transaction ID");
-                    onConfirm(transactionId, userUpiId);
+                    onConfirm(transactionId, userUpiId, paidAmount);
                     setTransactionId('');
                     setUserUpiId('');
+                    setPaidAmount('');
                   }}
                   className="w-full bg-[#ff0033] text-white py-5 rounded-[1.5rem] font-black text-xs uppercase tracking-widest shadow-xl shadow-red-500/20 active:scale-95 transition-all flex items-center justify-center gap-2"
                >

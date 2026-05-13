@@ -79,7 +79,7 @@ const ProfilePage = () => {
   ].filter(Boolean);
 
   const handleCopyCode = () => {
-    navigator.clipboard.writeText('DIAMOND777');
+    navigator.clipboard.writeText('LOTTERY777');
     alert('Referral code copied!');
   };
 
@@ -100,7 +100,7 @@ const ProfilePage = () => {
               </div>
                <h2 className="text-white text-3xl font-black uppercase tracking-tighter italic leading-none">{user?.name || 'Pranesh'}</h2>
                <p className="text-white/60 font-black text-[10px] uppercase tracking-[0.3em] mt-1 shadow-sm px-2 py-0.5 rounded-full border border-white/5 bg-black/5">
-                 {isAdmin ? 'Secretariat Authority' : 'Verified Member'}
+                 {isAdmin ? 'SMS Lottery Secretariat' : 'Verified Member'}
                </p>
                
                {isAdmin && (
@@ -256,7 +256,7 @@ const ProfilePage = () => {
         </div>
 
         <div className="p-8 text-center border-t border-gray-50 mt-4 opacity-30">
-           <p className="text-[9px] text-gray-300 font-bold uppercase tracking-[0.3em] font-serif italic italic leading-tight">Diamond Secretariat Authority Suite v4.5.1</p>
+           <p className="text-[9px] text-gray-300 font-bold uppercase tracking-[0.3em] font-serif italic italic leading-tight">SMS Lottery Secretariat Suite v4.5.1</p>
         </div>
       </div>
 
