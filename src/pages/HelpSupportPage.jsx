@@ -8,18 +8,21 @@ const HelpSupportPage = () => {
   const navigate = useNavigate();
   const { appSettings } = useCart();
 
+  const supportNumber = "447988024040";
+  const displayMobile = "+44 79 88 02 40 40";
+
   const supportOptions = [
-    appSettings.whatsapp && { 
+    { 
       icon: <img src="https://img.icons8.com/color/48/whatsapp--v1.png" alt="WA" className="w-6 h-6" />, 
       label: 'WhatsApp', 
       desc: 'Direct Messaging Support', 
-      action: () => window.open(appSettings.whatsapp, '_blank') 
+      action: () => window.open(`https://wa.me/${supportNumber}`, '_blank') 
     },
-    appSettings.telegram && { 
+    { 
       icon: <img src="https://img.icons8.com/color/48/telegram-app.png" alt="TG" className="w-6 h-6" />, 
       label: 'Telegram', 
       desc: 'Official Support Group', 
-      action: () => window.open(appSettings.telegram, '_blank') 
+      action: () => window.open(`https://t.me/+${supportNumber}`, '_blank') 
     },
     { 
       icon: <Mail size={20} />, 
@@ -33,7 +36,7 @@ const HelpSupportPage = () => {
       desc: 'Frequently asked questions', 
       action: () => alert('FAQs are currently being updated.') 
     },
-  ].filter(Boolean);
+  ];
 
   return (
     <PageWrapper title="HELP & SUPPORT" showNav={false}>
@@ -80,8 +83,8 @@ const HelpSupportPage = () => {
 
           <div className="bg-white p-6 rounded-[2rem] border border-gray-200 mt-8 shadow-sm text-center">
              <h3 className="text-sm font-black text-gray-900 uppercase italic">{appSettings.brandName}</h3>
-             <p className="text-[10px] text-gray-400 font-bold mt-1">Helpline: {appSettings.customerCare}</p>
-             <p className="text-[10px] text-gray-400 font-bold">Mon-Sat, 9AM to 9PM IST</p>
+             <p className="text-[10px] text-gray-400 font-bold mt-1 italic tracking-widest uppercase">Support: {displayMobile}</p>
+             <p className="text-[9px] text-gray-300 font-bold uppercase tracking-widest mt-2">Available 24/7 Official Support Network</p>
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PageWrapper, { SupportSection } from '../components/PageWrapper';
+import PageWrapper from '../components/PageWrapper';
 import { Phone, Lock, ChevronLeft, AlertCircle, CheckCircle2, ShieldCheck, ArrowRight, Save, Key, Mail, Send } from 'lucide-react';
 import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
@@ -10,7 +10,7 @@ import { sendPasswordResetEmail } from 'firebase/auth';
 const ResetPasswordPage = () => {
   const navigate = useNavigate();
   const [method, setMethod] = useState('mobile'); // 'mobile' or 'email'
-  const [step, setStep] = useState(1); 
+  const [step, setStep] = useState(1);
   const [identifier, setIdentifier] = useState(''); // Mobile or Email
   const [otp, setOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -38,12 +38,12 @@ const ResetPasswordPage = () => {
       } else {
         const userData = querySnapshot.docs[0].data();
         setUserDocId(querySnapshot.docs[0].id);
-        
+
         // Special logic for Admin accounts
         if (userData.role === 'admin') {
-           console.log("Authority account identified. Escalating to priority verification.");
+          console.log("Authority account identified. Escalating to priority verification.");
         }
-        
+
         setStep(2);
       }
     } catch (err) {
@@ -56,7 +56,7 @@ const ResetPasswordPage = () => {
   const handleEmailReset = async (e) => {
     e.preventDefault();
     if (!identifier) return;
-    
+
     setLoading(true);
     setError('');
     try {
@@ -128,7 +128,7 @@ const ResetPasswordPage = () => {
         tempPassword: newPassword,
         lastResetAt: new Date().toISOString()
       });
-      
+
       setSuccess(true);
     } catch (err) {
       setError('Failed to update credentials. Please contact support.');
@@ -140,42 +140,42 @@ const ResetPasswordPage = () => {
   return (
     <PageWrapper title="RECOVER ACCESS" showNav={false}>
       <div className="bg-white min-h-screen p-6 flex flex-col pt-10">
-        <button 
-          onClick={() => navigate('/login')} 
+        <button
+          onClick={() => navigate('/login')}
           className="flex items-center gap-2 text-gray-400 hover:text-[#ff0033] font-black text-[10px] uppercase tracking-widest transition-all mb-10 active:scale-95"
         >
           <ChevronLeft size={16} /> Return to Login
         </button>
 
         <div className="mb-10">
-           <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-[#ff0033] shadow-sm">
-                 <ShieldCheck size={24} />
-              </div>
-              <h2 className="text-3xl font-black text-gray-900 uppercase tracking-tighter italic leading-none">Security Center</h2>
-           </div>
-           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] leading-relaxed">
-             {method === 'mobile' ? (
-               <>
-                 {step === 1 && "Enter your registered mobile number to receive a verification code."}
-                 {step === 2 && `Enter the 6-digit code sent to +91 ${identifier}.`}
-                 {step === 3 && "Verification successful. Create your new secure password."}
-               </>
-             ) : (
-               "Enter your registered email address to receive a secure recovery link."
-             )}
-           </p>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-[#ff0033] shadow-sm">
+              <ShieldCheck size={24} />
+            </div>
+            <h2 className="text-3xl font-black text-gray-900 uppercase tracking-tighter italic leading-none">Security Center</h2>
+          </div>
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] leading-relaxed">
+            {method === 'mobile' ? (
+              <>
+                {step === 1 && "Enter your registered mobile number to receive a verification code."}
+                {step === 2 && `Enter the 6-digit code sent to +91 ${identifier}.`}
+                {step === 3 && "Verification successful. Create your new secure password."}
+              </>
+            ) : (
+              "Enter your registered email address to receive a secure recovery link."
+            )}
+          </p>
         </div>
 
         {step === 1 && !success && (
           <div className="flex gap-2 p-1 bg-gray-50 rounded-2xl mb-8 border border-gray-100">
-            <button 
+            <button
               onClick={() => { setMethod('mobile'); setError(''); }}
               className={`flex-1 py-3 rounded-xl font-black text-[9px] uppercase tracking-widest transition-all ${method === 'mobile' ? 'bg-white text-[#ff0033] shadow-sm border border-red-50' : 'text-gray-400'}`}
             >
               Mobile OTP
             </button>
-            <button 
+            <button
               onClick={() => { setMethod('email'); setError(''); }}
               className={`flex-1 py-3 rounded-xl font-black text-[9px] uppercase tracking-widest transition-all ${method === 'email' ? 'bg-white text-[#ff0033] shadow-sm border border-red-50' : 'text-gray-400'}`}
             >
@@ -207,10 +207,10 @@ const ResetPasswordPage = () => {
                       {method === 'mobile' ? (
                         <>
                           <div className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 font-black text-[10px] pr-4 border-r border-gray-100">+91</div>
-                          <input 
+                          <input
                             required
-                            className="w-full h-16 bg-gray-50 border border-gray-100 rounded-[1.5rem] pl-20 pr-6 outline-none font-bold text-gray-800 focus:bg-white focus:border-[#ff0033]/20 transition-all text-sm shadow-sm" 
-                            placeholder="10 Digit Number" 
+                            className="w-full h-16 bg-gray-50 border border-gray-100 rounded-[1.5rem] pl-20 pr-6 outline-none font-bold text-gray-800 focus:bg-white focus:border-[#ff0033]/20 transition-all text-sm shadow-sm"
+                            placeholder="10 Digit Number"
                             type="tel"
                             maxLength={10}
                             value={identifier}
@@ -220,10 +220,10 @@ const ResetPasswordPage = () => {
                       ) : (
                         <>
                           <Mail className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#ff0033] transition-colors" size={20} />
-                          <input 
+                          <input
                             required
-                            className="w-full h-16 bg-gray-50 border border-gray-100 rounded-[1.5rem] pl-16 pr-6 outline-none font-bold text-gray-800 focus:bg-white focus:border-[#ff0033]/20 transition-all text-sm shadow-sm" 
-                            placeholder="Mobile or Registered Email" 
+                            className="w-full h-16 bg-gray-50 border border-gray-100 rounded-[1.5rem] pl-16 pr-6 outline-none font-bold text-gray-800 focus:bg-white focus:border-[#ff0033]/20 transition-all text-sm shadow-sm"
+                            placeholder="Mobile or Registered Email"
                             type="text"
                             value={identifier}
                             onChange={(e) => setIdentifier(e.target.value)}
@@ -232,12 +232,12 @@ const ResetPasswordPage = () => {
                       )}
                     </div>
                   </div>
-                  <button 
+                  <button
                     disabled={loading}
-                    className="w-full h-16 bg-gray-950 text-white rounded-[1.5rem] font-black text-[11px] uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50" 
+                    className="w-full h-16 bg-gray-950 text-white rounded-[1.5rem] font-black text-[11px] uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
                     type="submit"
                   >
-                    {loading ? "SEARCHING..." : (method === 'mobile' ? "DISPATCH OTP" : "SEND RESET LINK")} 
+                    {loading ? "SEARCHING..." : (method === 'mobile' ? "DISPATCH OTP" : "SEND RESET LINK")}
                     {method === 'mobile' ? <ArrowRight size={18} className="text-[#ff0033]" /> : <Send size={18} className="text-[#ff0033]" />}
                   </button>
                 </form>
@@ -249,10 +249,10 @@ const ResetPasswordPage = () => {
                     <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Verification Code</label>
                     <div className="relative group">
                       <Lock className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#ff0033] transition-colors" size={20} />
-                      <input 
+                      <input
                         required
-                        className="w-full h-16 bg-gray-50 border border-gray-100 rounded-[1.5rem] pl-16 pr-6 outline-none font-black text-gray-800 focus:bg-white focus:border-[#ff0033]/20 transition-all text-xl tracking-[0.5em] text-center shadow-sm" 
-                        placeholder="······" 
+                        className="w-full h-16 bg-gray-50 border border-gray-100 rounded-[1.5rem] pl-16 pr-6 outline-none font-black text-gray-800 focus:bg-white focus:border-[#ff0033]/20 transition-all text-xl tracking-[0.5em] text-center shadow-sm"
+                        placeholder="······"
                         type="text"
                         maxLength={6}
                         value={otp}
@@ -261,9 +261,9 @@ const ResetPasswordPage = () => {
                     </div>
                     <p className="text-[8px] font-bold text-gray-400 uppercase text-center mt-2">Hint: Use 123456 for demonstration</p>
                   </div>
-                  <button 
+                  <button
                     disabled={loading}
-                    className="w-full h-16 bg-gray-950 text-white rounded-[1.5rem] font-black text-[11px] uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50" 
+                    className="w-full h-16 bg-gray-950 text-white rounded-[1.5rem] font-black text-[11px] uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
                     type="submit"
                   >
                     {loading ? "VERIFYING..." : "CONFIRM CODE"} <ShieldCheck size={18} className="text-[#ff0033]" />
@@ -277,19 +277,19 @@ const ResetPasswordPage = () => {
                     <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">New Secure Password</label>
                     <div className="relative group">
                       <Key className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#ff0033] transition-colors" size={20} />
-                      <input 
+                      <input
                         required
-                        className="w-full h-16 bg-gray-50 border border-gray-100 rounded-[1.5rem] pl-16 pr-6 outline-none font-bold text-gray-800 focus:bg-white focus:border-[#ff0033]/20 transition-all text-sm shadow-sm" 
-                        placeholder="Minimum 6 characters" 
+                        className="w-full h-16 bg-gray-50 border border-gray-100 rounded-[1.5rem] pl-16 pr-6 outline-none font-bold text-gray-800 focus:bg-white focus:border-[#ff0033]/20 transition-all text-sm shadow-sm"
+                        placeholder="Minimum 6 characters"
                         type="password"
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
                       />
                     </div>
                   </div>
-                  <button 
+                  <button
                     disabled={loading}
-                    className="w-full h-16 bg-gray-950 text-white rounded-[1.5rem] font-black text-[11px] uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50" 
+                    className="w-full h-16 bg-gray-950 text-white rounded-[1.5rem] font-black text-[11px] uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
                     type="submit"
                   >
                     {loading ? "UPDATING..." : "UPDATE CREDENTIALS"} <Save size={18} className="text-[#ff0033]" />
@@ -298,7 +298,7 @@ const ResetPasswordPage = () => {
               )}
             </motion.div>
           ) : (
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               className="bg-emerald-50 border border-emerald-100 rounded-[2rem] p-10 text-center space-y-6"
@@ -315,7 +315,7 @@ const ResetPasswordPage = () => {
               <p className="text-[10px] text-gray-500 font-bold leading-relaxed px-4">
                 Please login with your new credentials to access your dashboard.
               </p>
-              <button 
+              <button
                 onClick={() => navigate('/login')}
                 className="w-full h-14 bg-gray-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg active:scale-95 transition-all"
               >
@@ -327,7 +327,7 @@ const ResetPasswordPage = () => {
 
         <SupportSection />
         <div className="mt-auto py-10 opacity-30 text-center">
-           <p className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 italic">SMS Lottery Secretariat Authority • 2026</p>
+          <p className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 italic">SMS Lottery Secretariat Authority • 2026</p>
         </div>
       </div>
     </PageWrapper>

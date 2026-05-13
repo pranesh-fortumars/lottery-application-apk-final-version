@@ -273,30 +273,23 @@ export const BottomNav = () => {
 };
 
 export const SupportSection = () => {
-  const { appSettings } = useCart();
+  const supportNumber = "447988024040";
+  const displayMobile = "+44 79 88 02 40 40";
   
   const supportLinks = [
     { 
       icon: <img src="https://img.icons8.com/color/48/whatsapp--v1.png" alt="WA" className="w-5 h-5" />, 
       label: 'WhatsApp', 
       color: 'bg-[#E8F5E9]', 
-      link: appSettings.whatsapp 
+      link: `https://wa.me/${supportNumber}` 
     },
     { 
       icon: <img src="https://img.icons8.com/color/48/telegram-app.png" alt="TG" className="w-5 h-5" />, 
       label: 'Telegram', 
       color: 'bg-[#E3F2FD]', 
-      link: appSettings.telegram 
-    },
-    { 
-      icon: <img src="https://img.icons8.com/color/48/phone.png" alt="PH" className="w-5 h-5" />, 
-      label: 'Helpline', 
-      color: 'bg-red-50', 
-      link: `tel:${appSettings.customerCare}` 
-    },
-  ].filter(item => item.link);
-
-  if (supportLinks.length === 0) return null;
+      link: `https://t.me/+${supportNumber}` 
+    }
+  ];
 
   return (
     <div className="mt-4 px-6 pb-6">
@@ -307,18 +300,18 @@ export const SupportSection = () => {
                   <p className="text-[8px] font-black text-gray-400 uppercase tracking-[0.2em] italic">Need Support?</p>
                   <div className="flex gap-2 items-center">
                      <a 
-                       href={appSettings.whatsapp || '#'} 
-                       target={appSettings.whatsapp ? "_blank" : "_self"}
+                       href={supportLinks[0].link} 
+                       target="_blank"
                        rel="noopener noreferrer" 
-                       className={`transition-all ${appSettings.whatsapp ? 'hover:scale-110 active:scale-95' : 'opacity-20 grayscale pointer-events-none'}`}
+                       className="hover:scale-110 active:scale-95 transition-all"
                      >
                         <img src="https://img.icons8.com/color/48/whatsapp--v1.png" alt="WA" className="w-3.5 h-3.5" />
                      </a>
                      <a 
-                       href={appSettings.telegram || '#'} 
-                       target={appSettings.telegram ? "_blank" : "_self"}
+                       href={supportLinks[1].link} 
+                       target="_blank"
                        rel="noopener noreferrer" 
-                       className={`transition-all ${appSettings.telegram ? 'hover:scale-110 active:scale-95' : 'opacity-20 grayscale pointer-events-none'}`}
+                       className="hover:scale-110 active:scale-95 transition-all"
                      >
                         <img src="https://img.icons8.com/color/48/telegram-app.png" alt="TG" className="w-3.5 h-3.5" />
                      </a>
@@ -327,37 +320,14 @@ export const SupportSection = () => {
                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
             </div>
             
-            <div className="grid grid-cols-3 gap-2">
-               {[
-                 { 
-                   icon: <img src="https://img.icons8.com/color/48/whatsapp--v1.png" alt="WA" className="w-5 h-5" />, 
-                   label: 'WhatsApp', 
-                   color: 'bg-[#E8F5E9]', 
-                   link: appSettings.whatsapp 
-                 },
-                 { 
-                   icon: <img src="https://img.icons8.com/color/48/telegram-app.png" alt="TG" className="w-5 h-5" />, 
-                   label: 'Telegram', 
-                   color: 'bg-[#E3F2FD]', 
-                   link: appSettings.telegram 
-                 },
-                 { 
-                   icon: <img src="https://img.icons8.com/color/48/phone.png" alt="PH" className="w-5 h-5" />, 
-                   label: 'Helpline', 
-                   color: 'bg-red-50', 
-                   link: appSettings.customerCare ? `tel:${appSettings.customerCare}` : null 
-                 },
-               ].map((item, idx) => (
+            <div className="grid grid-cols-2 gap-2">
+               {supportLinks.map((item, idx) => (
                  <a
                    key={idx}
-                   href={item.link || '#'}
-                   target={item.link ? "_blank" : "_self"}
+                   href={item.link}
+                   target="_blank"
                    rel="noopener noreferrer"
-                   className={`flex flex-col items-center justify-center p-2 rounded-2xl border border-gray-100 transition-all group/item ${
-                     item.link 
-                       ? 'hover:bg-white hover:shadow-md hover:-translate-y-0.5' 
-                       : 'opacity-40 grayscale pointer-events-none'
-                   }`}
+                   className="flex flex-col items-center justify-center p-2 rounded-2xl border border-gray-100 transition-all group/item hover:bg-white hover:shadow-md hover:-translate-y-0.5"
                  >
                    <div className={`w-9 h-9 ${item.color} rounded-xl flex items-center justify-center mb-1 group-hover/item:scale-110 transition-transform`}>
                      {item.icon}
@@ -366,6 +336,9 @@ export const SupportSection = () => {
                  </a>
                ))}
             </div>
+            <p className="text-[7px] font-bold text-gray-300 uppercase tracking-widest text-center mt-1 italic">
+              Official: {displayMobile}
+            </p>
          </div>
       </div>
     </div>
