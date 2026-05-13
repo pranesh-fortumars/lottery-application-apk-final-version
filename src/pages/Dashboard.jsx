@@ -4,29 +4,20 @@ import { useNavigate } from 'react-router-dom';
 import { Mail, Diamond, QrCode, Shield } from 'lucide-react';
 import { usePayment } from '../context/PaymentContext';
 import { useCart } from '../context/CartContext';
-import { DRAW_SLOTS } from '../constants/lotteryConfig';
+import { DRAW_SLOTS, getCutoffTime, isSlotClosed } from '../constants/lotteryConfig';
 import { SupportSection } from '../components/PageWrapper';
 
-const CountdownTimer = ({ drawTime }) => {
+const CountdownTimer = ({ drawTime, brand, appSettings }) => {
   const [timeLeft, setTimeLeft] = useState({ h: '00', m: '00', s: '00' });
 
   useEffect(() => {
     const calculateTime = () => {
+      const cutoff = getCutoffTime(drawTime, brand, appSettings);
+      if (!cutoff) return;
+      
       const now = new Date();
-      const parts = drawTime.match(/(\d+):(\d+)\s*(AM|PM)/);
-      if (!parts) return;
+      let diff = cutoff - now;
       
-      let hours = parseInt(parts[1]);
-      const minutes = parseInt(parts[2]);
-      const ampm = parts[3];
-      
-      if (ampm === 'PM' && hours !== 12) hours += 12;
-      if (ampm === 'AM' && hours === 12) hours = 0;
-      
-      const drawDate = new Date();
-      drawDate.setHours(hours, minutes, 0, 0);
-      
-      let diff = drawDate - now;
       if (diff < 0) {
         setTimeLeft({ h: '00', m: '00', s: '00' });
         return;
@@ -42,13 +33,16 @@ const CountdownTimer = ({ drawTime }) => {
     calculateTime();
     const timer = setInterval(calculateTime, 1000);
     return () => clearInterval(timer);
-  }, [drawTime]);
+  }, [drawTime, brand, appSettings]);
 
   return (
-    <div className="flex gap-1.5 mt-2">
-      <div className="bg-white text-black w-10 h-10 flex items-center justify-center rounded-lg font-black text-xl shadow-inner border border-gray-100">{timeLeft.h}</div>
-      <div className="bg-white text-black w-10 h-10 flex items-center justify-center rounded-lg font-black text-xl shadow-inner border border-gray-100">{timeLeft.m}</div>
-      <div className="bg-white text-black w-10 h-10 flex items-center justify-center rounded-lg font-black text-xl shadow-inner border border-gray-100">{timeLeft.s}</div>
+    <div className="flex flex-col">
+       <p className="text-[7px] font-black text-white/50 uppercase tracking-[0.2em] mb-1">Booking Ends In</p>
+       <div className="flex gap-1.5">
+          <div className="bg-white/10 backdrop-blur-md text-white w-9 h-9 flex items-center justify-center rounded-lg font-black text-lg border border-white/10 shadow-lg">{timeLeft.h}</div>
+          <div className="bg-white/10 backdrop-blur-md text-white w-9 h-9 flex items-center justify-center rounded-lg font-black text-lg border border-white/10 shadow-lg">{timeLeft.m}</div>
+          <div className="bg-white/10 backdrop-blur-md text-white w-9 h-9 flex items-center justify-center rounded-lg font-black text-lg border border-white/10 shadow-lg">{timeLeft.s}</div>
+       </div>
     </div>
   );
 };
@@ -59,28 +53,9 @@ const Dashboard = () => {
   const { appSettings } = useCart();
   const jackpotVisible = appSettings.jackpotVisible;
 
-  const isClosed = (drawTime) => {
-    const now = new Date();
-    const parts = drawTime.match(/(\d+)[.:](\d+)\s*(AM|PM)/);
-    if (!parts) return true;
-    
-    let hours = parseInt(parts[1]);
-    const minutes = parseInt(parts[2]);
-    const ampm = parts[3];
-    
-    if (ampm === 'PM' && hours !== 12) hours += 12;
-    if (ampm === 'AM' && hours === 12) hours = 0;
-    
-    const drawDate = new Date();
-    drawDate.setHours(hours, minutes, 0, 0);
-    
-    // Closed if within 15 minutes of draw or after draw
-    const diffInMinutes = (drawDate - now) / (1000 * 60);
-    return diffInMinutes <= 15;
-  };
-
   const games = DRAW_SLOTS.map(game => {
-    const isKerala = game.brand.toUpperCase() === 'KERALA';
+    const marketName = game.brand;
+    const isKerala = marketName.toUpperCase() === 'KERALA';
     const globalLock = appSettings.globalSalesClosed;
     const forceClosed = isKerala && appSettings.keralaSalesClosed;
     
@@ -90,10 +65,10 @@ const Dashboard = () => {
     return {
       time: effectiveTime,
       originalTime: game.time,
-      name: game.brand,
-      type: game.brand.toLowerCase(),
+      name: marketName,
+      type: marketName.toLowerCase(),
       id: game.id,
-      closed: globalLock || forceClosed || isClosed(effectiveTime)
+      closed: globalLock || forceClosed || isSlotClosed(effectiveTime, marketName, appSettings)
     };
   });
 
@@ -186,7 +161,7 @@ const Dashboard = () => {
                     <span className="bg-red-600 text-white px-4 py-1.5 rounded-full text-[12px] font-black uppercase tracking-widest animate-pulse shadow-lg">CLOSED</span>
                   </div>
                 ) : (
-                  <CountdownTimer drawTime={game.time} />
+                  <CountdownTimer drawTime={game.time} brand={game.name} appSettings={appSettings} />
                 )}
               </div>
               

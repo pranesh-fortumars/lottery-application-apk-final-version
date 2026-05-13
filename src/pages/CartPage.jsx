@@ -6,6 +6,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { usePayment } from '../context/PaymentContext';
 import PaymentModal from '../components/PaymentModal';
+import { getBrandBySlot, isSlotClosed } from '../constants/lotteryConfig';
 
 const CartPage = () => {
   const navigate = useNavigate();
@@ -15,8 +16,11 @@ const CartPage = () => {
   const [showPayment, setShowPayment] = useState(false);
   const { activePayment } = usePayment();
 
-  const hasKeralaItems = cart.some(item => (item.title || "").toUpperCase().includes('KERALA'));
-  const keralaOverrideActive = hasKeralaItems && appSettings?.keralaSalesClosed;
+  const closedItems = cart.filter(item => {
+    const itemBrand = (item.title || "").toUpperCase().includes('JACKPOT') ? 'JACKPOT' : getBrandBySlot(item.draw);
+    return isSlotClosed(item.draw, itemBrand, appSettings);
+  });
+  const anyClosed = closedItems.length > 0;
   
   const bonusAvailable = user?.bonusBalance || 0;
   const bonusUsed = Math.min(cartTotal, bonusAvailable);
@@ -24,7 +28,7 @@ const CartPage = () => {
   const isFullBonus = remainingToPay === 0;
 
   const handlePay = async () => {
-    if (cart.length === 0 || keralaOverrideActive) return;
+    if (cart.length === 0 || anyClosed) return;
     
     if (isFullBonus) {
       if (window.confirm(`Use ₹${bonusUsed} from your Referral Bonus to purchase these tickets? This will be submitted for admin approval.`)) {
@@ -66,10 +70,10 @@ const CartPage = () => {
     <div className="w-full flex gap-3">
       <button 
         onClick={handlePay}
-        disabled={isProcessing || cart.length === 0 || keralaOverrideActive}
-        className={`flex-1 text-white py-4 rounded-2xl flex items-center justify-center gap-2 font-black text-sm shadow-[0_15px_30px_-5px_rgba(255,0,85,0.4)] active:scale-95 transition-all disabled:opacity-50 border-b-4 border-black/10 ${keralaOverrideActive ? 'bg-gray-400' : 'bg-[#ff0033]'}`}
+        disabled={isProcessing || cart.length === 0 || anyClosed}
+        className={`flex-1 text-white py-4 rounded-2xl flex items-center justify-center gap-2 font-black text-sm shadow-[0_15px_30px_-5px_rgba(255,0,85,0.4)] active:scale-95 transition-all disabled:opacity-50 border-b-4 border-black/10 ${anyClosed ? 'bg-gray-400' : 'bg-[#ff0033]'}`}
       >
-        <ShoppingCart size={20} fill="white" /> {isProcessing ? 'Waiting...' : (keralaOverrideActive ? 'Sales Closed' : (isFullBonus ? 'Pay with Bonus' : 'Confirm Pay'))}
+        <ShoppingCart size={20} fill="white" /> {isProcessing ? 'Waiting...' : (anyClosed ? 'Slot Expired' : (isFullBonus ? 'Pay with Bonus' : 'Confirm Pay'))}
       </button>
       
       <button 
@@ -90,16 +94,21 @@ const CartPage = () => {
            <span className="text-xl font-black uppercase tracking-tight font-serif">Your Cart</span>
         </div>
 
-        {/* Kerala Override Warning */}
-        {keralaOverrideActive && (
+        {/* Slot Closure Warning */}
+        {anyClosed && (
           <div className="w-full max-w-sm bg-red-50 border border-red-200 p-4 rounded-2xl mb-6 flex flex-col items-center text-center gap-2">
             <ShoppingCart className="text-red-600 animate-bounce" size={24} />
             <p className="text-[10px] font-black text-red-600 uppercase tracking-widest">
-              Action Required: Kerala Sales Closed
+              Action Required: Slots Expired
             </p>
             <p className="text-[8px] font-bold text-gray-500 leading-relaxed uppercase">
-              Administrator has manually closed ticket sales for Kerala Lottery. Please remove Kerala items from your cart to proceed with other purchases.
+              Some items in your cart belong to draws that are now closed. Please remove these items to proceed.
             </p>
+            <div className="flex flex-wrap gap-1 justify-center mt-1">
+               {closedItems.map((it, idx) => (
+                 <span key={idx} className="bg-red-600 text-white text-[7px] px-2 py-0.5 rounded-full font-black">{it.draw}</span>
+               ))}
+            </div>
           </div>
         )}
 

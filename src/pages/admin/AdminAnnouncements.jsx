@@ -39,10 +39,10 @@ import {
   Save
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
-import { MARKET_GROUPS, getBrandBySlot } from '../../constants/lotteryConfig';
+import { MARKET_GROUPS, getBrandBySlot, isSlotClosed } from '../../constants/lotteryConfig';
 
 const AdminAnnouncements = () => {
-  const { purchasedTickets, addResult, declaredResults, prizeScheme, updateScheme } = useCart();
+  const { purchasedTickets, addResult, declaredResults, prizeScheme, updateScheme, appSettings } = useCart();
   const [activeTab, setActiveTab] = useState('dispatch'); 
   
   // Workflow Navigation State
@@ -98,19 +98,12 @@ const AdminAnnouncements = () => {
 
   const isDrawFinished = (timeStr, targetDate) => {
     if (!timeStr) return false;
-    const now = new Date();
+    const nowStr = new Date().toISOString().split('T')[0];
+    if (targetDate < nowStr) return true;
+    if (targetDate > nowStr) return false;
     
-    // If targetDate is in the past, draw is definitely finished
-    if (targetDate < now.toISOString().split('T')[0]) return true;
-    
-    const parts = timeStr.match(/(\d+)[.:](\d+)\s*(AM|PM)/);
-    if (!parts) return true;
-    let h = parseInt(parts[1]);
-    if (parts[3] === 'PM' && h !== 12) h += 12;
-    if (parts[3] === 'AM' && h === 12) h = 0;
-    const d = new Date();
-    d.setHours(h, parseInt(parts[2]), 0, 0);
-    return (d - now) <= 0;
+    const brand = getBrandBySlot(timeStr);
+    return isSlotClosed(timeStr, brand, appSettings);
   };
 
   // --- 🛰️ DYNAMIC COMBINATION ENGINE (Lively Sync) ---

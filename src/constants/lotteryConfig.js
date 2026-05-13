@@ -23,3 +23,40 @@ export const MARKET_GROUPS = {
   'DEAR': ['01:00 PM', '06:00 PM', '08:00 PM'],
   'KERALA': ['03:00 PM']
 };
+
+/**
+ * Standardized Slot Closing Logic
+ * @param {string} slotTime - The official draw time (e.g. '01:00 PM')
+ * @param {string} brand - 'DEAR' or 'KERALA'
+ * @param {object} appSettings - Firestore settings for dynamic overrides
+ * @returns {boolean} - True if slot is closed for purchasing
+ */
+export const getCutoffTime = (drawTime, brand, appSettings) => {
+  const parts = drawTime.match(/(\d+):(\d+)\s*(AM|PM)/);
+  if (!parts) return null;
+  
+  let hours = parseInt(parts[1]);
+  const minutes = parseInt(parts[2]);
+  const ampm = parts[3];
+  
+  if (ampm === 'PM' && hours !== 12) hours += 12;
+  if (ampm === 'AM' && hours === 12) hours = 0;
+  
+  const cutoff = new Date();
+  cutoff.setHours(hours, minutes, 0, 0);
+  
+  if (brand === 'DEAR' || brand === 'JACKPOT') {
+    cutoff.setMinutes(cutoff.getMinutes() - 5);
+  } else if (brand === 'KERALA' && appSettings?.keralaSalesClosed) {
+    cutoff.setHours(14, 0, 0, 0);
+  }
+  
+  return cutoff;
+};
+
+export const isSlotClosed = (drawTime, brand, appSettings) => {
+  if (appSettings?.globalSalesClosed) return true;
+  const now = new Date();
+  const cutoff = getCutoffTime(drawTime, brand, appSettings);
+  return !cutoff || now >= cutoff;
+};

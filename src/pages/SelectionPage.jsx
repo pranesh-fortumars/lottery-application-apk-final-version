@@ -4,7 +4,7 @@ import PageWrapper from '../components/PageWrapper';
 import { ScrollText, Gavel, ShoppingCart, Lock, Info } from 'lucide-react';
 import BettingCard from '../components/BettingCard';
 import { useCart } from '../context/CartContext';
-import { getSlotById } from '../constants/lotteryConfig';
+import { getSlotById, isSlotClosed } from '../constants/lotteryConfig';
 
 const SelectionPage = () => {
   const navigate = useNavigate();
@@ -21,29 +21,9 @@ const SelectionPage = () => {
   
   const getGameName = () => `${marketName} LOTTERY`;
   
-  const isClosed = (timeStr) => {
-    if (!timeStr) return false;
-    const now = new Date();
-    const parts = timeStr.match(/(\d+)[.:](\d+)\s*(AM|PM)/);
-    if (!parts) return true;
-    
-    let hours = parseInt(parts[1]);
-    const minutes = parseInt(parts[2]);
-    const ampm = parts[3];
-    
-    if (ampm === 'PM' && hours !== 12) hours += 12;
-    if (ampm === 'AM' && hours === 12) hours = 0;
-    
-    const drawDate = new Date();
-    drawDate.setHours(hours, minutes, 0, 0);
-    
-    const diffInMinutes = (drawDate - now) / (1000 * 60);
-    return diffInMinutes <= 0; // Exactly at draw time
-  };
-
   const globalLock = appSettings?.globalSalesClosed;
   const forceClosed = earlyClosure || globalLock;
-  const closed = forceClosed || isClosed(drawTime);
+  const closed = forceClosed || isSlotClosed(drawTime, marketName, appSettings);
 
   const abcTiers = [
     { price: "12.00", win: "₹ 6250, 250, 25" },

@@ -16,7 +16,7 @@ import {
   setDoc
 } from 'firebase/firestore';
 import { db } from '../firebase';
-import { getBrandBySlot } from '../constants/lotteryConfig';
+import { getBrandBySlot, isSlotClosed } from '../constants/lotteryConfig';
 
 const CartContext = React.createContext();
 
@@ -412,11 +412,13 @@ export const CartProvider = ({ children }) => {
       return;
     }
 
-    // Safety Override Check for Kerala
-    const hasKerala = cart.some(item => (item.title || "").toUpperCase().includes('KERALA'));
-    if (hasKerala && appSettings?.keralaSalesClosed) {
-      alert("Kerala Lottery sales are currently closed by the administrator.");
-      return;
+    // Final Slot Timing Validation for ALL items in cart
+    for (const item of cart) {
+      const itemBrand = (item.title || "").toUpperCase().includes('JACKPOT') ? 'JACKPOT' : getBrandBySlot(item.draw);
+      if (isSlotClosed(item.draw, itemBrand, appSettings)) {
+        alert(`Booking for ${itemBrand} (${item.draw}) is now closed. Please remove expired items from your cart.`);
+        return;
+      }
     }
 
     try {

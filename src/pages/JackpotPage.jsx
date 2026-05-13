@@ -4,6 +4,7 @@ import PageWrapper from '../components/PageWrapper';
 import { ScrollText, Gavel, ShoppingCart, Sparkles } from 'lucide-react';
 import BettingCard from '../components/BettingCard';
 import { useCart } from '../context/CartContext';
+import { isSlotClosed } from '../constants/lotteryConfig';
 
 const JackpotPage = () => {
   const navigate = useNavigate();
@@ -19,25 +20,6 @@ const JackpotPage = () => {
   if (cartLoading) return null;
   if (!jackpotVisible) return null;
   
-  const isClosed = (slotTime) => {
-    const now = new Date();
-    const parts = slotTime.match(/(\d+)[.:](\d+)\s*(AM|PM)/);
-    if (!parts) return true;
-    
-    let hours = parseInt(parts[1]);
-    const minutes = parseInt(parts[2]);
-    const ampm = parts[3];
-    
-    if (ampm === 'PM' && hours !== 12) hours += 12;
-    if (ampm === 'AM' && hours === 12) hours = 0;
-    
-    const slotDate = new Date();
-    slotDate.setHours(hours, minutes, 0, 0);
-    
-    const diffInMinutes = (slotDate - now) / (1000 * 60);
-    return diffInMinutes <= 15;
-  };
-
   const slots = [
     { time: '10.30 AM' },
     { time: '11.30 AM' },
@@ -49,7 +31,7 @@ const JackpotPage = () => {
     { time: '07.30 PM' },
   ].map(s => ({
     ...s,
-    status: isClosed(s.time) ? 'closed' : 'active'
+    status: isSlotClosed(s.time, 'JACKPOT', appSettings) ? 'closed' : 'active'
   }));
 
   const firstActiveSlot = slots.find(s => s.status === 'active')?.time || slots[slots.length - 1].time;
@@ -85,7 +67,7 @@ const JackpotPage = () => {
       <div className="bg-[#f9f9f9]">
         <div className="bg-[#fce4ec] py-3 px-4 shadow-sm border-b border-white/50 text-center mb-4">
            <p className="text-white bg-[#ff1c74] inline-block px-5 py-2 rounded-full text-[10px] font-black tracking-wide uppercase">
-             Jackpot lot purchase open till 15 mins before draw
+             Jackpot lot purchase open till 5 mins before draw
            </p>
         </div>
 
@@ -118,13 +100,14 @@ const JackpotPage = () => {
             ))}
           </div>
 
-          <BettingCard title="Single Digit" winText="Win ₹ 100" price="11.00" digits={1} gameName="Jackpot" />
-          <BettingCard title="Two Digits" winText="Win ₹ 1000" price="11.00" digits={2} gameName="Jackpot" />
+          <BettingCard title="Single Digit" winText="Win ₹ 100" price="11.00" digits={1} gameName="Jackpot" drawTime={activeSlot} />
+          <BettingCard title="Two Digits" winText="Win ₹ 1000" price="11.00" digits={2} gameName="Jackpot" drawTime={activeSlot} />
           <BettingCard 
             title="Three Digits" 
             digits={3} 
             gameName="Jackpot" 
             priceOptions={abcTiers}
+            drawTime={activeSlot}
           />
         </div>
       </div>
