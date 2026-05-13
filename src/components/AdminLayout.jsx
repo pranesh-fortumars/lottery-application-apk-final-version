@@ -2,7 +2,6 @@ import React from 'react';
 import { useLocation } from 'react-router-dom';
 import PageWrapper from './PageWrapper';
 import ErrorBoundary from './ErrorBoundary';
-import AdminRealTimeNotifier from './admin/AdminRealTimeNotifier';
 
 const AdminLayout = ({ children }) => {
   const location = useLocation();
@@ -23,7 +22,6 @@ const AdminLayout = ({ children }) => {
       <ErrorBoundary>
         {children}
       </ErrorBoundary>
-      <AdminRealTimeNotifier />
     </PageWrapper>
   );
 };

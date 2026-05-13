@@ -34,6 +34,7 @@ export const CartProvider = ({ children }) => {
   const [purchasedTickets, setPurchasedTickets] = React.useState([]);
   const [declaredResults, setDeclaredResults] = React.useState([]);
   const [notifications, setNotifications] = React.useState([]);
+  const [adminAlerts, setAdminAlerts] = React.useState([]);
   const [prizeScheme, setPrizeScheme] = React.useState(null);
   const [hoveringNews, setHoveringNews] = React.useState('');
   const [appSettings, setAppSettings] = React.useState({
@@ -153,6 +154,57 @@ export const CartProvider = ({ children }) => {
       setNotifications(sortedNotifs);
     });
 
+    let unsubscribeAdminTx = () => {};
+    let unsubscribeAdminWd = () => {};
+
+    if (user?.role === 'admin') {
+      unsubscribeAdminTx = onSnapshot(
+        query(collection(db, 'pending_transactions'), where('status', '==', 'pending')),
+        (snap) => {
+          const alerts = snap.docs.map(doc => {
+            const data = doc.data();
+            return {
+              id: doc.id,
+              userId: data.userId,
+              title: data.type === 'topup' ? 'New Wallet Top-Up' : 'New Ticket Purchase',
+              message: `${data.userName || 'User'} requested ₹${data.amount}`,
+              type: 'admin_alert',
+              source: 'transaction',
+              read: false,
+              timestamp: data.timestamp
+            };
+          });
+          setAdminAlerts(prev => {
+            const wdAlerts = prev.filter(a => a.source === 'withdrawal');
+            return [...alerts, ...wdAlerts];
+          });
+        }
+      );
+
+      unsubscribeAdminWd = onSnapshot(
+        query(collection(db, 'withdrawals'), where('status', '==', 'pending')),
+        (snap) => {
+          const alerts = snap.docs.map(doc => {
+            const data = doc.data();
+            return {
+              id: doc.id,
+              userId: data.userId,
+              title: 'Withdrawal Request',
+              message: `${data.userName || 'User'} requested ₹${data.amount}`,
+              type: 'admin_alert',
+              source: 'withdrawal',
+              read: false,
+              timestamp: data.timestamp
+            };
+          });
+          setAdminAlerts(prev => {
+            const txAlerts = prev.filter(a => a.source === 'transaction');
+            return [...txAlerts, ...alerts];
+          });
+        }
+      );
+    }
+
     setLoading(false);
     return () => {
       unsubscribeScheme();
@@ -160,6 +212,8 @@ export const CartProvider = ({ children }) => {
       unsubscribeResults();
       unsubscribeNotifs();
       unsubscribeSettings();
+      unsubscribeAdminTx();
+      unsubscribeAdminWd();
     };
   }, [user]);
 
@@ -566,7 +620,7 @@ export const CartProvider = ({ children }) => {
     <CartContext.Provider value={{ 
       cart, addToCart, removeFromCart, clearCart, confirmPurchase,
       cartTotal, purchasedTickets, declaredResults, addResult, lastAnnouncement,
-      notifications, markAllRead, addNotification, loading, refreshTickets,
+      notifications, adminAlerts, markAllRead, addNotification, loading, refreshTickets,
       prizeScheme, updateScheme, hoveringNews, updateHoveringNews,
       appSettings, updateAppSettings
     }}>

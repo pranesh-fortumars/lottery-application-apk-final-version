@@ -22,18 +22,19 @@ import {
   X,
   Trophy,
   Info,
-  ChevronLeft
+  ChevronLeft,
+  Wallet
 } from 'lucide-react';
 
 export const Header = ({ title, showBack = false }) => {
   const navigate = useNavigate();
   const { logout, user } = useAuth();
-  const { notifications, markAllRead, lastAnnouncement, hoveringNews, appSettings } = useCart();
+  const { notifications, adminAlerts, markAllRead, lastAnnouncement, hoveringNews, appSettings } = useCart();
   const [showNotifs, setShowNotifs] = useState(false);
   
   const displayTitle = title || appSettings.brandName || "SECURE PORTAL";
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter(n => !n.read).length + adminAlerts.length;
 
   const handleOpenNotifs = () => {
     setShowNotifs(true);
@@ -144,33 +145,65 @@ export const Header = ({ title, showBack = false }) => {
               </div>
 
               <div className="flex-grow overflow-y-auto p-4 space-y-4 scrollbar-hide">
-                {notifications.length === 0 ? (
+                {notifications.length === 0 && adminAlerts.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full opacity-20 space-y-4">
                     <Bell size={64} />
                     <p className="font-black uppercase tracking-widest text-xs">No notifications yet</p>
                   </div>
                 ) : (
-                  notifications.map((n) => (
-                    <div key={n.id} className={`p-4 rounded-2xl border transition-all relative overflow-hidden group ${n.read ? 'bg-gray-50 border-gray-100' : 'bg-white border-red-100 shadow-md ring-1 ring-red-50'}`}>
-                      <div className="flex gap-3">
-                        <div className={`w-10 h-10 rounded-xl shrink-0 flex items-center justify-center ${
-                          n.type === 'win' ? 'bg-emerald-500 text-white shadow-emerald-500/20 shadow-lg' :
-                          n.type === 'result' ? 'bg-amber-500 text-white shadow-amber-500/20 shadow-lg' :
-                          'bg-red-50 text-red-500'
-                        }`}>
-                          {n.type === 'win' ? <Trophy size={18} /> : 
-                           n.type === 'result' ? <Megaphone size={18} /> : 
-                           <Info size={18} />}
-                        </div>
-                        <div className="flex-grow pr-4">
-                          <h4 className="text-[11px] font-black text-gray-900 uppercase tracking-tight mb-1">{n.title}</h4>
-                          <p className="text-[10px] font-medium text-gray-500 leading-relaxed">{n.message}</p>
-                          <span className="text-[8px] font-black text-gray-300 uppercase tracking-widest mt-2 block">{n.time}</span>
-                        </div>
+                  <>
+                    {/* Admin Specific Alerts */}
+                    {adminAlerts.map((a) => (
+                      <div 
+                        key={a.id} 
+                        onClick={() => {
+                          setShowNotifs(false);
+                          navigate(a.source === 'withdrawal' ? '/admin/withdrawals' : '/admin/approvals');
+                        }}
+                        className="p-4 rounded-2xl border bg-white border-orange-100 shadow-md ring-1 ring-orange-50 cursor-pointer hover:bg-orange-50 transition-all relative overflow-hidden"
+                      >
+                         <div className="flex gap-3">
+                           <div className="w-10 h-10 rounded-xl shrink-0 flex items-center justify-center bg-gradient-to-br from-orange-500 to-red-600 text-white shadow-orange-500/20 shadow-lg">
+                             {a.source === 'withdrawal' ? <Wallet size={18} /> : <ShoppingCart size={18} />}
+                           </div>
+                           <div className="flex-grow pr-4">
+                              <h4 className="text-[11px] font-black text-gray-900 uppercase tracking-tight mb-1 flex items-center gap-2">
+                                 {a.title} 
+                                 <span className="bg-orange-100 text-orange-600 text-[7px] px-1.5 py-0.5 rounded-full">ACTION REQUIRED</span>
+                              </h4>
+                              <p className="text-[10px] font-medium text-gray-500 leading-relaxed">{a.message}</p>
+                              <span className="text-[8px] font-black text-gray-300 uppercase tracking-widest mt-2 block">
+                                 {a.timestamp?.toDate ? a.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'JUST NOW'}
+                              </span>
+                           </div>
+                         </div>
+                         <div className="absolute top-4 right-4 w-2 h-2 bg-orange-500 rounded-full animate-ping"></div>
                       </div>
-                      {!n.read && <div className="absolute top-4 right-4 w-2 h-2 bg-[#ff0033] rounded-full shadow-[0_0_5px_#ff0033]"></div>}
-                    </div>
-                  ))
+                    ))}
+
+                    {/* Standard User Notifications */}
+                    {notifications.map((n) => (
+                      <div key={n.id} className={`p-4 rounded-2xl border transition-all relative overflow-hidden group ${n.read ? 'bg-gray-50 border-gray-100' : 'bg-white border-red-100 shadow-md ring-1 ring-red-50'}`}>
+                        <div className="flex gap-3">
+                          <div className={`w-10 h-10 rounded-xl shrink-0 flex items-center justify-center ${
+                            n.type === 'win' ? 'bg-emerald-500 text-white shadow-emerald-500/20 shadow-lg' :
+                            n.type === 'result' ? 'bg-amber-500 text-white shadow-amber-500/20 shadow-lg' :
+                            'bg-red-50 text-red-500'
+                          }`}>
+                            {n.type === 'win' ? <Trophy size={18} /> : 
+                             n.type === 'result' ? <Megaphone size={18} /> : 
+                             <Info size={18} />}
+                          </div>
+                          <div className="flex-grow pr-4">
+                            <h4 className="text-[11px] font-black text-gray-900 uppercase tracking-tight mb-1">{n.title}</h4>
+                            <p className="text-[10px] font-medium text-gray-500 leading-relaxed">{n.message}</p>
+                            <span className="text-[8px] font-black text-gray-300 uppercase tracking-widest mt-2 block">{n.time}</span>
+                          </div>
+                        </div>
+                        {!n.read && <div className="absolute top-4 right-4 w-2 h-2 bg-[#ff0033] rounded-full shadow-[0_0_5px_#ff0033]"></div>}
+                      </div>
+                    ))}
+                  </>
                 )}
               </div>
 
